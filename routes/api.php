@@ -1,10 +1,10 @@
 <?php
 
+use App\Http\Controllers\CourseStudentController;
 use App\Http\Controllers\LabController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\MessagesController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -19,11 +19,12 @@ use Illuminate\Support\Facades\Route;
 */
 
 
-Route::get('/quiz',[QuizController::class,'listQuiz']);
-Route::post('/quiz',[QuizController::class,'Quiz']);
-Route::get('/list-users',[UserController::class,'ListUsers']);
-Route::get('/labs',[LabController::class,'list']);
-Route::get('/get-user-message',[MessagesController::class,'GetMessage']);
+Route::get('/quiz', [QuizController::class, 'listQuiz']);
+Route::post('/quiz', [QuizController::class, 'Quiz']);
+Route::get('/list-users', [UserController::class, 'ListUsers']);
+Route::get('/labs', [LabController::class, 'list']);
+Route::get('/get-user-message', [MessagesController::class, 'GetMessage']);
+Route::get('/course', [CourseStudentController::class, 'getCourseByUserId']);
 
 
 
