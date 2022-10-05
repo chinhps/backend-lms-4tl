@@ -9,9 +9,10 @@ class CourseStudent extends Model
 {
     use HasFactory;
     protected $table = 'course_student';
-
+    
     public function user()
     {
-        return $this->hasOne(User::class, 'id', 'user_id');
+        return $this->hasMany(User::class, 'id', 'user_id');
     }
+
 }

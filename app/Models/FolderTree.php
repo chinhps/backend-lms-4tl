@@ -5,13 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Messages extends Model
+class FolderTree extends Model
 {
     use HasFactory;
+    protected $table = "folder_tree";
+    protected $primaryKey = "folder_tree_id";
 
-    public function user()
-    {
-        return $this->hasOne(User::class,'id','sender');
-    }
 
 }
