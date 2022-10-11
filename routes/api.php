@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CoursesController;
 use App\Http\Controllers\CourseStudentController;
 use App\Http\Controllers\FolderTreeController;
 use App\Http\Controllers\LabController;
@@ -25,13 +26,16 @@ Route::post('/quiz', [QuizController::class, 'Quiz']);
 Route::get('/list-users', [UserController::class, 'ListUsers']);
 Route::get('/labs', [LabController::class, 'list']);
 Route::get('/get-user-message', [MessagesController::class, 'GetMessage']);
-Route::get('/course', [CourseStudentController::class, 'getCourseByUserId']);
+
+Route::prefix('/course')->group(function () {
+
+    Route::get('/{id}', [CoursesController::class, 'getCourseById']);
+});
 
 Route::prefix('/branch')->group(function () {
 
     Route::get('/', [FolderTreeController::class, 'list_parent']);
     Route::get("{path}", [FolderTreeController::class, 'list_child'])->where('path', '.+');
-
 });
 
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
