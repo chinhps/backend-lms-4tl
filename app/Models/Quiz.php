@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Subjects extends Model
+class Quiz extends Model
 {
     use HasFactory;
-    protected $table = 'subjects';
+    protected $table = "quizs";
     protected $hidden = [
         'created_at',
-        'updated_at',
+        'updated_at'
     ];
 }

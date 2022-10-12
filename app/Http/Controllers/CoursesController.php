@@ -3,16 +3,29 @@
 namespace App\Http\Controllers;
 
 use App\Models\Courses;
+use App\Models\CoursesDocument;
+use App\Models\Labs;
+use App\Models\Quiz;
 use Illuminate\Http\Request;
 
 class CoursesController extends Controller
 {
-    public function getCourseById(Request $request)
+    public function getCourseById($id)
     {
-        $data = Courses::with('subject_id', "teacher")->where('id', $request->id)->get();
-        // $_ = $data;
+        $id_class = 3;//3;
+        $data = Courses::with('class_id','subject_id','teacher_id')->find($id);
+        $getListQuiz = Quiz::where('subject_id',$data['subject_id'])->get();
+        $getDocument = CoursesDocument::where('subject_id',$data['subject_id'])
+        ->whereIn('audience',[0,$id_class])
+        ->get();
+        $getLabs = Labs::where('subject_id',$data['subject_id'])
+        ->whereIn('audience',[0,$id_class])
+        ->get();
         return response()->json([
-            $data
+            "course_info" => $data,
+            "listQuiz" => $getListQuiz,
+            "listDocument" => $getDocument,
+            "listLabs" => $getLabs
         ]);
     }
 }
