@@ -2,25 +2,67 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\LogsQuiz;
+use App\Models\QuestionBank;
+use App\Models\Quiz;
 use Illuminate\Http\Request;
 
 class QuizController extends Controller
 {
-    public function listQuiz(Request $request)
+
+    public $idUser;
+
+    public function __construct()
     {
-        
-        return response()->json([
-            "name" => $request->name,
-            "msg" => "day la quiz "
-        ]);
+        $this->idUser = 3;
     }
 
-    public function Quiz(Request $request)
+    public function saveQuizSubject(Request $request)
     {
+
+    }
+
+    public function getQuizSubject(Request $request)
+    {
+        $level = $request->input('level');
+        $id_subject = $request->input('id_subject');
+
+        #Lưu thời gian làm bài
+        
+            # kiểm tra xem đã từng làm bài chưa
+            $id_quiz = Quiz::where('subject_id',$id_subject)
+            ->where('level',$level)
+            ->value('id');
+
+            $logQuiz = LogsQuiz::where('user_id',$this->idUser)
+            ->where('quiz_id',$id_quiz);
+
+        # lấy thông tin bài quiz
+        $data = QuestionBank::select('id', 'question', 'answers')
+            ->where('subject_id', $id_subject)
+            ->where('level', $level)
+            ->inRandomOrder()
+            ->take(10)
+            ->get();
+
+        foreach ($data as $key => $val) {
+            $formatAnswer = json_decode($val['answers'], true);
+
+            foreach ($formatAnswer as $keyAs => $answer) {
+                unset($answer['id']);
+                unset($answer['isCorrect']);
+                $formatAnswer[$keyAs] = $answer;
+            }
+
+            $data[$key]['answers'] = $formatAnswer;
+            unset($formatAnswer);
+        }
+
         return response()->json([
-            "quiz1" => $request->quiz1,
-            "quiz2" => $request->quiz2,
-            "msg" => "day la quiz "
+            "msg" => 200,
+            "id_subject" => $id_subject,
+            "level" => $request->level,
+            "question" => $data
         ]);
     }
 }
