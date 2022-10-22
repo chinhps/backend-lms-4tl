@@ -14,6 +14,11 @@ class UserController extends Controller
         $this->userRepository = $userRepository;
     }
 
+    public function getMe() {
+        $data_user = $this->userRepository->infoMe();
+        return BaseResponse::ResWithStatus($data_user);
+    }
+
     public function ListUsers()
     {
         $data = $this->userRepository->getList();
