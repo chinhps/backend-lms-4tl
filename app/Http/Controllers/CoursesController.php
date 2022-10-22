@@ -35,11 +35,19 @@ class CoursesController extends Controller
         // })->select('*')->get()->toArray();
         
 
+        // ->whereIn('audience',[0,$id_class])
+        // ->whereIn('type',['lab'])
+        // ->get();
+        $getAsms = Labs::where('subject_id',$data['subject_id'])
+        ->whereIn('audience',[0,$id_class])
+        ->whereIn('type',['asm'])
+        ->get();
         return response()->json([
             "course_info" => $data,
             "listQuiz" => $getListQuiz,
             "listDocument" => $getDocument,
-            "listLabs" => $getLabs
+            "listLabs" => $getLabs,
+            "listAsms" => $getAsms
         ]);
     }
 }
