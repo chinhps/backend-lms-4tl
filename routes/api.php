@@ -16,7 +16,7 @@ Route::get('/get-user-message', [MessagesController::class, 'GetMessage']);
 # khóa học
 Route::prefix('/course')->group(function () {
     # tham gia khóa học
-    Route::get('/join/{id}', [CourseStudentController::class, 'addStudent_to_Course']);
+    Route::post('/join/{id}', [CourseStudentController::class, 'addStudent_to_Course']);
     # thông tin khóa học
     Route::prefix('/{id}')->group(function () {
         Route::get('/', [CoursesController::class, 'getCourseById']);
