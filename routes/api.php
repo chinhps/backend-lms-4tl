@@ -1,13 +1,22 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CoursesController;
 use App\Http\Controllers\CourseStudentController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\LabController;
 use App\Http\Controllers\QuizController;
-use App\Http\Controllers\UserController;
 use App\Http\Controllers\MessagesController;
 use Illuminate\Support\Facades\Route;
+
+
+# người dùng
+Route::post('auth/login',[AuthController::class,'Login'])->name('login');
+Route::post('auth/register',[AuthController::class,'Register']);
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('user/get-me',[AuthController::class,'getme']);
+});
 
 
 Route::get('/labs', [LabController::class, 'list']);
@@ -23,11 +32,6 @@ Route::prefix('/course')->group(function () {
         Route::get('/quiz', [QuizController::class, 'getQuizSubject']);
         Route::post('/quiz', [QuizController::class, 'saveQuizSubject']);
     });
-});
-
-# người dùng
-Route::prefix('/users')->group(function () {
-    Route::get('/get-me', [UserController::class, 'getMe']);
 });
 
 # cây thư mục
