@@ -7,6 +7,7 @@ use App\Http\Controllers\BranchController;
 use App\Http\Controllers\LabController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\MessagesController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -16,6 +17,7 @@ Route::post('auth/register',[AuthController::class,'Register']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('user/get-me',[AuthController::class,'getme']);
+    Route::get('user/logout',[AuthController::class,'logout']);
 });
 
 
@@ -40,6 +42,9 @@ Route::prefix('/branch')->group(function () {
     Route::get("{path}", [BranchController::class, 'list_child'])->where('path', '.+');
 });
 
+# acac
+Route::post('/users', [UserController::class, 'list']);
+Route::put('/users/{id}', [UserController::class, 'list']);
 
 
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

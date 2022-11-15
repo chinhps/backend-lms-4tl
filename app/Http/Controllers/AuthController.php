@@ -42,10 +42,15 @@ class AuthController extends Controller
     }
 
     public function getMe() {
-        $data_user = $this->userRepository->infoMe();
+        $data_user = Auth::user()->load(['role']);
         return BaseResponse::ResWithStatus($data_user);
     }
-
+    
+    public function logout() {
+        Auth::logout();
+         return response()->json(['msg' => 'Dang xuat thành công!']);
+    }
+        
     public function ListUsers()
     {
         $data = $this->userRepository->getList();

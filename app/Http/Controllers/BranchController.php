@@ -6,19 +6,14 @@ use App\Models\Courses;
 use App\Models\FolderTree;
 use App\Repositories\Branch\BranchInterface;
 use Illuminate\Http\Request;
+use App\AllBranch;
 
 class BranchController extends Controller
 {
-    public BranchInterface $branchRepository;
-
-    public function __construct(BranchInterface $branchRepository)
-    {
-        $this->branchRepository = $branchRepository;
-    }
-
+ 
     public function list_parent()
     {
-        $data = $this->branchRepository->parents();
+        $data = AllBranch::where('parent',0)->get();
         return response()->json($data);
     }
 
