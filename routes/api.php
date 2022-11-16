@@ -1,9 +1,9 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BranchController;
 use App\Http\Controllers\CoursesController;
 use App\Http\Controllers\CourseStudentController;
-use App\Http\Controllers\BranchController;
 use App\Http\Controllers\LabController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\MessagesController;
@@ -39,7 +39,7 @@ Route::prefix('/course')->group(function () {
 # cây thư mục
 Route::prefix('/branch')->group(function () {
     Route::get('/', [BranchController::class, 'list_parent']);
-    Route::get("{path}", [BranchController::class, 'list_child'])->where('path', '.+');
+    // Route::get("{path}", [BranchController::class, 'list_child'])->where('path', '.+');
 });
 
 # acac

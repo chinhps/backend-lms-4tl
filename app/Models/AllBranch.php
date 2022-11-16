@@ -10,4 +10,14 @@ class AllBranch extends Model
     use HasFactory;
     protected $table = "all_branch";
 
+    public function branchable()
+    {
+        return $this->morphTo();
+    }
+    
+    public function majors()
+    {
+        return $this->morphToModel(Major::class);
+    }
+
 }
