@@ -7,7 +7,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class SubjectController extends Controller
-{
+{   
+    public function list()
+    {
+        $data = DB::table('subjects')->join('majors', 'subjects.major_id', '=', 'majors.id')
+        ->selectRaw('subjects.id, subjects.code, subjects.name, subjects.status, subjects.major_id, majors.name as major_name')->get();
+        return response()->json($data);
+    }
     public function new(Request $request)
     {
         try {

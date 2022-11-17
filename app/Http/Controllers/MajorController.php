@@ -9,7 +9,7 @@ class MajorController extends Controller
 {
     public function list()
     {
-        $data = DB::table('majors')->where('status', 1)->get();
+        $data = DB::table('majors')->get();
         return response()->json($data);
     }
 }

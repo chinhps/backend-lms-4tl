@@ -10,7 +10,8 @@ class CoursesController extends Controller
 {
     public function list()
     {
-        $data = DB::table('courses')->get();
+        $data = DB::table('courses')->join('subjects', 'courses.subject_id', '=', 'subjects.id')
+        ->selectRaw('courses.name as course_name, subjects.name as subject_name, courses.id, courses.subject_id, courses.class_code, courses.status')->get();
         return response()->json($data);
     }
     public function new(Request $request)
