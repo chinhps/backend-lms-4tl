@@ -58,6 +58,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::prefix('/subjects')->group(function () {
+        Route::get('/', [SubjectController::class, 'list']);
         Route::get('/{id}', [SubjectController::class, 'getOne']);
         Route::put('/{id}', [SubjectController::class, 'put']);
         Route::post('/new', [SubjectController::class, 'new']);

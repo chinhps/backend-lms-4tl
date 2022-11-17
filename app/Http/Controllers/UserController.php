@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends BaseController
 {
@@ -44,13 +45,15 @@ class UserController extends BaseController
         try {
             $data = DB::table('subjects')->insert([
                 'user_code' => $request->user_code,
-                'password' => $request->password,
+                'password' => Hash::make($request->password),
                 'email' => $request->email,
                 'phone_number' => $request->phone_number,
                 'name' => $request->name,
                 'status' => $request->status,
                 'role_id' => $request->role_id,
                 'class_id' => $request->class_id,
+
+
             ]);
             return response()->json(["msg" => "Thêm thành công!"]);
         } catch (Exception $e) {
