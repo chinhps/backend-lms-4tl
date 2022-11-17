@@ -70,9 +70,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/', [MajorController::class, 'list']);
     });
 
-    Route::prefix('user')->group(function () {
+    Route::prefix('users')->group(function () {
         Route::post('/new', [UserController::class, 'new']);
-
+        Route::get('/{id}', [UserController::class, 'getOne']);
+        Route::put('/{id}', [UserController::class, 'update']);
         // Route::get('/', [BranchController::class, '']);
         // Route::get('/get-teacher', [UserController::class, 'getTeacher']);
     });

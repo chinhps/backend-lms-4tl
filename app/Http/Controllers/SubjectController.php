@@ -11,7 +11,7 @@ class SubjectController extends Controller
     public function list()
     {
         $data = DB::table('subjects')->join('majors', 'subjects.major_id', '=', 'majors.id')
-        ->selectRaw('subjects.id, subjects.code, subjects.name, subjects.status, subjects.major_id, majors.name as major_name')->get();
+        ->selectRaw('subjects.id, subjects.code, subjects.name, subjects.status, subjects.major_id, majors.name as major_name')->paginate(10);
         return response()->json($data);
     }
     public function new(Request $request)
@@ -32,7 +32,7 @@ class SubjectController extends Controller
 
     public function getOne(Request $request)
     {
-        $data = DB::table('subjects')->where('subject_id', $request->id)->first();
+        $data = DB::table('subjects')->where('id', $request->id)->first();
         return response()->json($data);
     }
 
