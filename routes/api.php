@@ -97,9 +97,8 @@ Route::prefix('/branch')->group(function () {
     // Route::get("{path}", [BranchController::class, 'list_child'])->where('path', '.+');
 });
 
-# acac
-Route::post('/users', [UserController::class, 'list']);
-Route::put('/users/{id}', [UserController::class, 'list']);
+# users
+Route::get('/users', [UserController::class, 'list']);
 
 
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
