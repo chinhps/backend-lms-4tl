@@ -91,6 +91,17 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 });
 
+# cây thư mục
+Route::prefix('/branch')->group(function () {
+    Route::get('/', [BranchController::class, 'list_parent']);
+    // Route::get("{path}", [BranchController::class, 'list_child'])->where('path', '.+');
+});
+
+# acac
+Route::post('/users', [UserController::class, 'list']);
+Route::put('/users/{id}', [UserController::class, 'list']);
+
+
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //     return $request->user();
 // });

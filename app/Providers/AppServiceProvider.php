@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\DocumentGroup;
+use App\Models\Major;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
 
@@ -23,5 +26,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        Relation::morphMap([
+            'majors' => Major::class,
+            'documents_group' => DocumentGroup::class
+        ]);
     }
 }
