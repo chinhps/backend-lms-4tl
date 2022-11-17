@@ -8,39 +8,57 @@ use App\Models\DocumentGroup;
 use App\Models\Major;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class BranchController extends Controller
 {
 
     protected $full_data;
 
-    public function getAllBranchWithChild($branches,$parent = 0,$level = 0)
+    public function getAllBranchWithChild($branches, $parent = 0, $level = 0)
     {
-        foreach($branches as $key => $branch) {
-            if($branch['parent'] == $parent) {
+        foreach ($branches as $key => $branch) {
+            if ($branch['parent'] == $parent) {
                 $this->full_data[] = [
                     'key' => $key,
-                    'name' => $branch['name'],
-                    'slug' => $branch['slug'],
-                    'level' => $level  
+                    'level' => $level,
+                    ...$branch
                 ];
                 unset($branches[$key]);
-                $this->getAllBranchWithChild($branches,$branch['id'],$levels = $level + 1);
+                $this->getAllBranchWithChild($branches, $branch['id'], $levels = $level + 1);
             }
         }
     }
 
-    public function list_parent()
+    public function list_parent(Request $request)
     {
+        $slugOridParent = $request->page ?? null;
+        $table = $request->table ?? null;
+
+        $primayKey = [
+            'subjects' => 'major_id',
+            'courses' => 'subject_id'
+        ];
+
+        if ($table) {
+            $data_child = DB::table($table)->where('slug', $slugOridParent)->first();
+
+            if ($data_child) {
+                $data_branch = DB::table($data_child->branchable_type)
+                    ->where($primayKey[$data_child->branchable_type], $data_child->id)
+                    ->get();
+
+                return response()->json($data_branch);
+            }
+        }
 
         $data_branch = AllBranch::get()->toArray();
-        foreach($data_branch as $branch) {
 
-            if($branch['branchable_type'] != null) {
-
+        foreach ($data_branch as $branch) {
+            if ($branch['branchable_type'] != null) {
                 $data_child = DB::table($branch['branchable_type']);
-                if($branch['branchable_id']) {
-                    $data_child = $data_child->where('group_id',$branch['branchable_id']);
+                if ($branch['branchable_id']) {
+                    $data_child = $data_child->where('group_id', $branch['branchable_id']);
                 }
                 $data_child = $data_child->get();
 
@@ -49,17 +67,28 @@ class BranchController extends Controller
                         "id" => $branch['branchable_type'] . $branch['id'],
                         "name" => $child->name,
                         "parent" => $branch['id'],
-                        "branchable_id" => 0,
-                        "branchable_type" => null,
-                        "slug" => "kho-hoc-lieu"
-    
+                        "branchable_id" => $child->id,
+                        "thumb" => "https://i.imgur.com/v4YUHjU.png",
+                        "branchable_type" => $branch['branchable_type'],
+                        "slug" => $child->slug ?? Str::slug($child->name),
                     ];
                 }
             }
         }
         $this->getAllBranchWithChild($data_branch);
-        // return response()->json($this->full_data);
-        return view('test',['data' => $this->full_data]);
+
+        if ($slugOridParent) {
+            $slugId = AllBranch::where('slug', $slugOridParent)->first();
+            foreach ($this->full_data as $key => $slugBranch) {
+                if ($slugBranch['parent'] != ($slugId->id ?? null)) {
+                    unset($this->full_data[$key]);
+                }
+            }
+            $this->full_data = array_values($this->full_data);
+        }
+
+        return response()->json($this->full_data);
+        // return view('test',['data' => $this->full_data]);
     }
 
     public function list_child($params)
@@ -81,7 +110,7 @@ class BranchController extends Controller
         //         }, 'subject_id','class_id'])->where('tree_id', $lastChild)->get();
         //     }
         // }
-       
+
         return response()->json($data);
     }
 }
