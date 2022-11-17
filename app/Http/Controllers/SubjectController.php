@@ -60,9 +60,4 @@ class SubjectController extends Controller
             return response()->json($e, 500);
         }
     }
-    public function list()
-    {
-        $data = DB::table('subjects')->get();
-        return response()->json($data);
-    }
 }
