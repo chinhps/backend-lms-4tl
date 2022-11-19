@@ -15,6 +15,7 @@ use App\Http\Controllers\RolesController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 
@@ -105,13 +106,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
 Route::get('/create-slug', function () {
-    $data = DB::table('courses')->get();
-    foreach ($data as $vl) {
-        DB::table('courses')->where('id', $vl->id)->update([
-            'slug' => Str::slug($vl->name . '-' . $vl->class_code)
-        ]);
-    }
-    return 123;
+    // $data = DB::table('courses')->get();
+    // foreach ($data as $vl) {
+    //     DB::table('courses')->where('id', $vl->id)->update([
+    //         'slug' => Str::slug($vl->name . '-' . $vl->class_code)
+    //     ]);
+    // }
+    return Hash::make(123456789);
 });
 
 
