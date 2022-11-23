@@ -77,14 +77,19 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::prefix('/majors')->group(function () {
-        // Route::post('/new', [SubjectController::class, 'new']);
+        Route::post('/new', [MajorController::class, 'new']);
         Route::get('/', [MajorController::class, 'list']);
+        Route::get('/{id}', [MajorController::class, 'getById']);
+        Route::put('/{id}', [MajorController::class, 'put']);
+        Route::delete('/{id}', [MajorController::class, 'delete']);
     });
 
     Route::prefix('users')->group(function () {
         Route::post('/new', [UserController::class, 'new']);
         Route::get('/{id}', [UserController::class, 'getOne']);
         Route::put('/{id}', [UserController::class, 'update']);
+        Route::delete('/{id}', [UserController::class, 'delete']);
+
         // Route::get('/', [BranchController::class, '']);
         // Route::get('/get-teacher', [UserController::class, 'getTeacher']);
     });
@@ -98,6 +103,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::prefix('roles')->group(function () {
         Route::get('/', [RolesController::class, 'list']);
+        Route::get('/{id}', [RolesController::class, 'getOne']);
+        Route::put('/{id}', [RolesController::class, 'put']);
+        Route::delete('/{id}', [RolesController::class, 'delete']);
+
 
         // Route::get('/', [BranchController::class, '']);
         // Route::get('/get-teacher', [UserController::class, 'getTeacher']);

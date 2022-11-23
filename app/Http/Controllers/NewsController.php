@@ -15,4 +15,48 @@ class NewsController extends Controller
         $data = DB::table('news')->take($limit)->get();
         return response()->json($data);
     }
+    public function delete(Request $request)
+    {
+        try {
+            DB::table('news')->where('id', $request->id)->delete();
+            return response()->json(["msg" => "Xóa thành công id $request->id!"]);
+        } catch (Exception $e) {
+            return response()->json($e, 500);
+        }
+    }
+    public function new(Request $request)
+    {
+        try {
+            $data = DB::table('news')->insert([
+                'thumb' => $request->thumb,
+                'user_id' => $request->user_id,
+                'title' => $request->title,
+                'content' => $request->content,
+            ]);
+            return response()->json(["msg" => "Thêm thành công!"]);
+        } catch (Exception $e) {
+            return response()->json($e, 500);
+        }
+    }
+
+    public function getOne(Request $request)
+    {
+        $data = DB::table('news')->where('id', $request->id)->first();
+        return response()->json($data);
+    }
+
+    public function put(Request $request)
+    {
+        try {
+            DB::table('news')->where('id', $request->id)->update([
+                'thumb' => $request->thumb,
+                'user_id' => $request->user_id,
+                'title' => $request->title,
+                'content' => $request->content,
+            ]);
+            return response()->json(["msg" => "Sửa thành công id $request->id!"]);
+        } catch (Exception $e) {
+            return response()->json($e, 500);
+        }
+    }
 }

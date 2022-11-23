@@ -8,11 +8,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class SubjectController extends Controller
-{   
+{
     public function list()
     {
         $data = DB::table('subjects')->join('majors', 'subjects.major_id', '=', 'majors.id')
-        ->selectRaw('subjects.id, subjects.code, subjects.name, subjects.status, subjects.major_id, majors.name as major_name')->paginate(10);
+            ->selectRaw('subjects.id, subjects.code, subjects.name, subjects.status, subjects.major_id, majors.name as major_name')->orderBy('id', 'desc')->paginate(10);
         return response()->json($data);
     }
     public function new(Request $request)
@@ -22,7 +22,7 @@ class SubjectController extends Controller
                 'major_id' => $request->major_id,
                 'code' => $request->code,
                 'name' => $request->name,
-                'slug' => Str::slug($request->name.'-'.$request->code),
+                'slug' => Str::slug($request->name . '-' . $request->code),
                 'status' => $request->status
             ]);
             return response()->json(["msg" => "Thêm thành công!"]);
@@ -44,7 +44,7 @@ class SubjectController extends Controller
                 'major_id' => $request->major_id,
                 'code' => $request->code,
                 'name' => $request->name,
-                'slug' => Str::slug($request->name.'-'.$request->code),
+                'slug' => Str::slug($request->name . '-' . $request->code),
                 'status' => $request->status
             ]);
             return response()->json(["msg" => "Sửa thành công id $request->id!"]);
@@ -56,7 +56,7 @@ class SubjectController extends Controller
     public function delete(Request $request)
     {
         try {
-            DB::table('courses')->where('id', $request->id)->delete();
+            DB::table('subjects')->where('id', $request->id)->delete();
             return response()->json(["msg" => "Xóa thành công id $request->id!"]);
         } catch (Exception $e) {
             return response()->json($e, 500);
