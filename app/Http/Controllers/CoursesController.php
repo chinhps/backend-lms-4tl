@@ -11,7 +11,7 @@ class CoursesController extends Controller
     public function list()
     {
         $data = DB::table('courses')->join('subjects', 'courses.subject_id', '=', 'subjects.id')
-        ->selectRaw('courses.name as course_name, subjects.name as subject_name, courses.id, courses.subject_id, courses.class_code, courses.status')->paginate(10);
+            ->selectRaw('courses.name as course_name, subjects.name as subject_name, courses.id, courses.subject_id, courses.class_code, courses.status')->orderBy('id', 'desc')->paginate(10);
         return response()->json($data);
     }
     public function new(Request $request)
