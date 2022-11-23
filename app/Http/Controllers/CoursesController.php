@@ -2,12 +2,29 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Course;
+use App\Models\CourseJoined;
+use App\Models\Subject;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class CoursesController extends Controller
 {
+    public function showDocQuizLab($slug)
+    {   
+
+        $data = Course::with('quizs.deadlines','labs.deadlines')->where('slug',$slug)->first();
+        $subject = Subject::with('quizs.deadlines','labs.deadlines')->find($data->subject_id);
+        $countStuden = CourseJoined::where('course_id',$data->id)->get();
+        return response()->json([
+            'courses' => $data,
+            'student_joined' => $countStuden,
+            'documents' => $data->documents,
+            'labs' => [...$data->labs,...$subject->labs],
+            'quizs' => [...$data->quizs,...$subject->quizs],
+        ]);
+    }
     public function list()
     {
         $data = DB::table('courses')->join('subjects', 'courses.subject_id', '=', 'subjects.id')

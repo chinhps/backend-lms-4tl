@@ -22,16 +22,25 @@ class CourseJoinedController extends Controller
     }
 
     public function joinCourse(Request $request)
-    {
+    {   
 
+        $data = DB::table('courses')->where('id',$request->idCourse)->first();
         try {
             DB::table('course_joined')->insert([
                 'course_id' => $request->idCourse,
                 'user_id' => Auth::id(),
             ]);
-            return response()->json(['status' => 200, 'msg' => 'Tham gia thành công!']);
+            return response()->json([
+                'status' => 200,
+                'slug' => $data->slug,
+                'msg' => 'Tham gia thành công!'
+            ]);
         } catch (Exception $e) {
-            return response()->json(['status' => 201, 'msg' => 'Đã tham gia khóa học!']);
+            return response()->json([
+                'status' => 201, 
+                'slug' => $data->slug,
+                'msg' => 'Đã tham gia khóa học!'
+            ]);
         }
     }
 }
