@@ -106,10 +106,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{id}', [RolesController::class, 'getOne']);
         Route::put('/{id}', [RolesController::class, 'put']);
         Route::delete('/{id}', [RolesController::class, 'delete']);
-
-
-        // Route::get('/', [BranchController::class, '']);
-        // Route::get('/get-teacher', [UserController::class, 'getTeacher']);
+        Route::post('/new', [RolesController::class, 'new']);
     });
 });
 

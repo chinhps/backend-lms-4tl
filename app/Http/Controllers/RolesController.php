@@ -10,7 +10,7 @@ class RolesController extends Controller
 {
     public function list()
     {
-        $data = DB::table('role')->get();
+        $data = DB::table('role')->orderBy('id', 'desc')->paginate(10);
         return response()->json($data);
     }
 
