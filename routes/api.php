@@ -11,6 +11,7 @@ use App\Http\Controllers\MajorController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\MessagesController;
 use App\Http\Controllers\NewsController;
+use App\Http\Controllers\QuestionBankController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\UserController;
@@ -101,6 +102,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Route::get('/', [BranchController::class, '']);
         // Route::get('/get-teacher', [UserController::class, 'getTeacher']);
+    });
+
+    Route::prefix('question_bank')->group(function () {
+        Route::get('/', [QuestionBankController::class, 'list']);
+        Route::post('/new', [QuestionBankController::class, 'new']);
     });
 });
 
