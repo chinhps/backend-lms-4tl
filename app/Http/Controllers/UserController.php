@@ -63,7 +63,7 @@ class UserController extends BaseController
     public function list()
     {
         $data = DB::table('users')->join('classes', 'users.class_id', '=', 'classes.id')->join('role', 'users.role_id', '=', 'role.id')
-            ->select('users.id', 'users.user_code', 'users.email', 'users.phone_number', 'users.name', 'users.status', 'users.role_id', 'users.class_id', 'users.created_at', 'users.updated_at', 'classes.class_name', 'role.role_name')->paginate(10);
+            ->select('users.id', 'users.user_code', 'users.email', 'users.phone_number', 'users.name', 'users.status', 'users.role_id', 'users.class_id', 'users.created_at', 'users.updated_at', 'classes.class_name', 'role.role_name')->orderBy('updated_at', 'desc')->paginate(10);
         return response()->json($data);
     }
     public function getOne(Request $request)
@@ -84,7 +84,16 @@ class UserController extends BaseController
                 'role_id' => $request->role_id,
                 'class_id' => $request->class_id,
             ]);
-            return response()->json(["msg" => "Thêm thành công!"]);
+            return response()->json(["msg" => "Sửa thành công id $request->id !"]);
+        } catch (Exception $e) {
+            return response()->json($e, 500);
+        }
+    }
+    public function delete(Request $request)
+    {
+        try {
+            DB::table('users')->where('id', $request->id)->delete();
+            return response()->json(["msg" => "Xóa thành công id $request->id!"]);
         } catch (Exception $e) {
             return response()->json($e, 500);
         }
