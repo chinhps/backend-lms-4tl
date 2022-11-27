@@ -14,12 +14,25 @@ class CoursesController extends Controller
     public function showDocQuizLab($slug)
     {   
 
-        $data = Course::with('quizs.deadlines','labs.deadlines')->where('slug',$slug)->first();
-        $subject = Subject::with('quizs.deadlines','labs.deadlines')->find($data->subject_id);
-        $countStuden = CourseJoined::where('course_id',$data->id)->get();
+        $data = Course::with(
+            'quizs.deadlines',
+            'quizs.point_submit',
+            'labs.deadlines',
+            'labs.point_submit',
+            'course_joined'
+        )->where('slug',$slug)->first();
+
+        $subject = Subject::with(
+            'quizs.deadlines',
+            'quizs.point_submit',
+            'labs.deadlines',
+            'labs.point_submit'
+        )->find($data->subject_id);
+
         return response()->json([
             'courses' => $data,
-            'student_joined' => $countStuden,
+            'test' => $subject,
+            'student_joined' => $data->course_joined,
             'documents' => $data->documents,
             'labs' => [...$data->labs,...$subject->labs],
             'quizs' => [...$data->quizs,...$subject->quizs],

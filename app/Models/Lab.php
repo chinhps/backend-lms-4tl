@@ -14,8 +14,14 @@ class Lab extends Model
     {
         return $this->morphTo();
     }
+    
     public function deadlines()
     {
         return $this->morphOne(Deadline::class, 'deadlineable');
+    }
+
+    public function point_submit()
+    {
+        return $this->morphMany(PointSubmit::class, 'pointSubmitable');
     }
 }

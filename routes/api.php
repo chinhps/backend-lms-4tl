@@ -13,6 +13,7 @@ use App\Http\Controllers\MessagesController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\QuestionBankController;
 use App\Http\Controllers\RolesController;
+use App\Http\Controllers\LoginWith\LoginGoogleController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\DB;
@@ -23,6 +24,8 @@ use Illuminate\Support\Str;
 # người dùng
 Route::post('auth/login', [AuthController::class, 'Login'])->name('login');
 Route::post('auth/register', [AuthController::class, 'Register']);
+Route::get('auth/callback', [LoginGoogleController::class, 'callback']);
+Route::post('auth/get-google-sign-in-url', [LoginGoogleController::class, 'getGoogleSignInUrl']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('user/get-me', [AuthController::class, 'getme']);
