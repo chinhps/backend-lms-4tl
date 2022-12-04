@@ -71,6 +71,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::prefix('/subjects')->group(function () {
+        Route::get('/fulllist', [SubjectController::class, 'listFull']);
         Route::get('/', [SubjectController::class, 'list']);
         Route::get('/{id}', [SubjectController::class, 'getOne']);
         Route::put('/{id}', [SubjectController::class, 'put']);
@@ -130,6 +131,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('question_bank')->group(function () {
         Route::get('/', [QuestionBankController::class, 'list']);
         Route::post('/new', [QuestionBankController::class, 'new']);
+        Route::get('/{id}', [QuestionBankController::class, 'getOne']);
+        Route::put('/{id}', [QuestionBankController::class, 'put']);
+        Route::delete('/{id}', [QuestionBankController::class, 'delete']);
     });
 });
 
