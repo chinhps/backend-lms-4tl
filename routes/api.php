@@ -99,9 +99,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::prefix('classes')->group(function () {
         Route::get('/', [ClassesController::class, 'list']);
-
-        // Route::get('/', [BranchController::class, '']);
-        // Route::get('/get-teacher', [UserController::class, 'getTeacher']);
+        Route::delete('/{id}', [ClassesController::class, 'delete']);
+        Route::post('/new', [ClassesController::class, 'new']);
+        Route::get('/{id}', [ClassesController::class, 'getOne']);
+        Route::put('/{id}', [ClassesController::class, 'put']);
     });
 
     Route::prefix('roles')->group(function () {
@@ -121,6 +122,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::prefix('permission-groups')->group(function () {
+        Route::get('/fulllist', [PermissionGroupController::class, 'listFull']);
         Route::get('/', [PermissionGroupController::class, 'list']);
         Route::get('/{id}', [PermissionGroupController::class, 'getOne']);
         Route::put('/{id}', [PermissionGroupController::class, 'put']);
