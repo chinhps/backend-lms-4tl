@@ -46,6 +46,9 @@ Route::middleware('auth:sanctum')->group(function () {
     # khóa học
     Route::prefix('/course')->group(function () {
 
+        # lấy bài quiz
+        Route::get('/quiz', [QuizController::class, 'getQuizCourse']);
+
         Route::get('/joined', [CourseJoinedController::class, 'getMyCourse']);
         # tham gia khóa học
         Route::post('/join', [CourseJoinedController::class, 'joinCourse']);
@@ -144,7 +147,7 @@ Route::get('/create-slug', function () {
     $data = DB::table('quizs')->get();
     foreach ($data as $vl) {
         DB::table('quizs')->where('id', $vl->id)->update([
-            'slug' => Str::slug($vl->name . '-' . $vl->quizable_id)
+            'slug' => Str::slug($vl->name . '-' . Str::random(4))
         ]);
     }
     return 123;
