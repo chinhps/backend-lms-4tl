@@ -14,6 +14,8 @@ use App\Http\Controllers\NewsController;
 use App\Http\Controllers\QuestionBankController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\LoginWith\LoginGoogleController;
+use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\PermissionGroupController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\DB;
@@ -72,6 +74,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::prefix('/subjects')->group(function () {
+        Route::get('/fulllist', [SubjectController::class, 'listFull']);
         Route::get('/', [SubjectController::class, 'list']);
         Route::get('/{id}', [SubjectController::class, 'getOne']);
         Route::put('/{id}', [SubjectController::class, 'put']);
@@ -112,9 +115,28 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/new', [RolesController::class, 'new']);
     });
 
+    Route::prefix('permissions')->group(function () {
+        Route::get('/', [PermissionController::class, 'list']);
+        Route::get('/{id}', [PermissionController::class, 'getOne']);
+        Route::put('/{id}', [PermissionController::class, 'put']);
+        Route::delete('/{id}', [PermissionController::class, 'delete']);
+        Route::post('/new', [PermissionController::class, 'new']);
+    });
+
+    Route::prefix('permission-groups')->group(function () {
+        Route::get('/', [PermissionGroupController::class, 'list']);
+        Route::get('/{id}', [PermissionGroupController::class, 'getOne']);
+        Route::put('/{id}', [PermissionGroupController::class, 'put']);
+        Route::delete('/{id}', [PermissionGroupController::class, 'delete']);
+        Route::post('/new', [PermissionGroupController::class, 'new']);
+    });
+
     Route::prefix('question_bank')->group(function () {
         Route::get('/', [QuestionBankController::class, 'list']);
         Route::post('/new', [QuestionBankController::class, 'new']);
+        Route::get('/{id}', [QuestionBankController::class, 'getOne']);
+        Route::put('/{id}', [QuestionBankController::class, 'put']);
+        Route::delete('/{id}', [QuestionBankController::class, 'delete']);
     });
 });
 

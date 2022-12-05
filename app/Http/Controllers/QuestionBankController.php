@@ -13,8 +13,8 @@ class QuestionBankController extends BaseController
 {
   public function list()
   {
-    $data = DB::table('question_bank')->join('subjects', 'question_bank.subject_id', '=', 'subjects.id')
-      ->select('question_bank.id', 'question_bank.subject_id', 'question_bank.question', 'question_bank.answers', 'question_bank.level', 'question_bank.user_id', 'question_bank.created_at', 'subjects.name as subject_name')
+    $data = DB::table('question_bank')->join('subjects', 'question_bank.subject_id', '=', 'subjects.id')->join('users', 'question_bank.user_id', '=', 'users.id')
+      ->select('question_bank.id', 'question_bank.subject_id', 'question_bank.question', 'question_bank.answers', 'question_bank.level', 'question_bank.user_id', 'question_bank.created_at', 'subjects.name as subject_name', 'users.name as user_name')
       ->paginate(10);
     return response()->json($data);
   }
@@ -35,4 +35,36 @@ class QuestionBankController extends BaseController
       return response()->json($e, 500);
     }
   }
+
+  public function getOne(Request $request)
+  {
+    $data = DB::table('question_bank')->where('id', $request->id)->first();
+    return response()->json($data);
+  }
+
+  public function put(Request $request)
+  {
+    try {
+      DB::table('question_bank')->where('id', $request->id)->update([
+        'subject_id' => $request->subject_id,
+        'question' => $request->question,
+        'answers' => $request->answers,
+        'level' => $request->level,
+        'user_id' => $request->user_id,
+      ]);
+      return response()->json(["msg" => "Sửa thành công id $request->id!"]);
+    } catch (Exception $e) {
+      return response()->json($e, 500);
+    }
+  }
+
+  public function delete(Request $request)
+    {
+        try {
+            DB::table('question_bank')->where('id', $request->id)->delete();
+            return response()->json(["msg" => "Xóa thành công id $request->id!"]);
+        } catch (Exception $e) {
+            return response()->json($e, 500);
+        }
+    }
 }
