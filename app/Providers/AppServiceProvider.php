@@ -10,6 +10,7 @@ use App\Models\Major;
 use App\Models\Quiz;
 use App\Models\Subject;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
 
@@ -31,6 +32,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        JsonResource::withoutWrapping();
         Relation::morphMap([
             'courses' => Course::class,
             'labs' => Lab::class,
