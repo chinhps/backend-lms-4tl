@@ -37,12 +37,14 @@ class CourseResource extends JsonResource
                     "name" => $item['name'],
                     "level" => $item['level'],
                     "slug" => $item['slug'],
+                    "max_working" => $item['deadlines']['max_working'] ?? 0,
                     "count_submit" => count($item['point_submit']) ?? 0,
                     "deadlines" => [
                         "time_end" => $item['deadlines']['time_end'] ?? null,
                         "time_start" => $item['deadlines']['time_start'] ?? null
                     ],
-                    "password" => ($item['deadlines'] != null && $item['deadlines'] != '') ? true : false
+                    "config" => $item['deadlines'] ? true : false,
+                    "password" => (isset($item['deadlines']) && $item['deadlines']['password'] != null && $item['deadlines'] != '') ? true : false
                 ];
             }),
             "quizs" => collect($this['quizs'])->map(function ($item) {
@@ -50,12 +52,14 @@ class CourseResource extends JsonResource
                     "name" => $item['name'],
                     "level" => $item['level'],
                     "slug" => $item['slug'],
+                    "max_working" => $item['deadlines']['max_working'] ?? 0,
                     "count_submit" => count($item['point_submit']) ?? 0,
                     "deadlines" => [
                         "time_end" => $item['deadlines']['time_end'] ?? null,
                         "time_start" => $item['deadlines']['time_start'] ?? null
                     ],
-                    "password" => ($item['deadlines'] != null && $item['deadlines'] != '') ? true : false
+                    "config" => $item['deadlines'] ? true : false,
+                    "password" => (isset($item['deadlines']) && $item['deadlines']['password'] != null && $item['deadlines'] != '') ? true : false
                 ];
             }),
         ];

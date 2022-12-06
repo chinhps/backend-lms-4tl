@@ -15,6 +15,11 @@ class Quiz extends Model
         return $this->morphOne(Deadline::class, 'deadlineable');
     }
 
+    public function quizable()
+    {
+        return $this->morphTo();
+    }
+
     public function point_submit()
     {
         return $this->morphMany(PointSubmit::class, 'pointSubmitable');

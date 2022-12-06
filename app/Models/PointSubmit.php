@@ -9,4 +9,16 @@ class PointSubmit extends Model
 {
     use HasFactory;
     protected $table = "point_submit";
+    protected $guarded = [];
+
+    public function pointSubmitable()
+    {
+        return $this->morphTo();
+    }
+
+    // public function pointSubmitable()
+    // {
+    //     return $this->morphTo();
+    // }
+
 }
