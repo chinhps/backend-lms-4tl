@@ -47,7 +47,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('/course')->group(function () {
 
         # lấy bài quiz
-        Route::get('/quiz', [QuizController::class, 'getQuizCourse']);
+        Route::post('/quiz', [QuizController::class, 'joinQuiz']);
 
         Route::get('/joined', [CourseJoinedController::class, 'getMyCourse']);
         # tham gia khóa học

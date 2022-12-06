@@ -12,6 +12,6 @@ class BaseResponse extends Controller
             "status" => $status,
             "msg" => $msg,
             // "data" => $data
-        ]);
+        ],$status);
     }
 }
