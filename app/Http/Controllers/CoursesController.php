@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\CourseResource;
 use App\Models\Course;
 use App\Models\CourseJoined;
 use App\Models\Subject;
@@ -12,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 class CoursesController extends Controller
 {
     public function showDocQuizLab($slug)
-    {   
+    {
 
         $data = Course::with(
             'quizs.deadlines',
@@ -20,7 +21,7 @@ class CoursesController extends Controller
             'labs.deadlines',
             'labs.point_submit',
             'course_joined'
-        )->where('slug',$slug)->first();
+        )->where('slug', $slug)->first();
 
         $subject = Subject::with(
             'quizs.deadlines',
@@ -29,13 +30,14 @@ class CoursesController extends Controller
             'labs.point_submit'
         )->find($data->subject_id);
 
-        return response()->json([
-            'courses' => $data,
-            'test' => $subject,
-            'student_joined' => $data->course_joined,
-            'documents' => $data->documents,
-            'labs' => [...$data->labs,...$subject->labs],
-            'quizs' => [...$data->quizs,...$subject->quizs],
+        return CourseResource::collection([
+            "data" => [
+                'courses' => $data,
+                'student_joined' => $data->course_joined,
+                'documents' => $data->documents,
+                'labs' => [...$data->labs, ...$subject->labs],
+                'quizs' => [...$data->quizs, ...$subject->quizs],
+            ]
         ]);
     }
     public function list()

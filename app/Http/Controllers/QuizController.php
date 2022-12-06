@@ -24,7 +24,7 @@ class QuizController extends Controller
             return BaseResponse::ResWithStatus("Mật khẩu sai không thể làm bài!", 403);
         }
 
-        return $quiz;
+        // return $quiz;
         
         $course = Course::where('slug', $slug_course)->first();
         $list_question = QuestionBank::where('subject_id', $course->subject_id)->take(10)->get();
