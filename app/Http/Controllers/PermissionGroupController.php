@@ -53,4 +53,9 @@ class PermissionGroupController extends Controller
             return response()->json($e, 500);
         }
     }
+    public function listFull()
+    {
+        $data = DB::table('permission_groups')->get();
+        return response()->json($data);
+    }
 }
