@@ -16,6 +16,7 @@ use App\Http\Controllers\RolesController;
 use App\Http\Controllers\LoginWith\LoginGoogleController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PermissionGroupController;
+use App\Http\Controllers\PointSubmitController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\DB;
@@ -36,6 +37,7 @@ Route::middleware('auth:sanctum')->group(function () {
     # cây thư mục
     Route::prefix('/news')->group(function () {
         Route::get('/', [NewsController::class, 'getAll']);
+        Route::post('/new', [NewsController::class, 'new']);
     });
 
     # cây thư mục
@@ -104,6 +106,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::prefix('classes')->group(function () {
+        Route::get('/fulllist', [ClassesController::class, 'listFull']);
         Route::get('/', [ClassesController::class, 'list']);
         Route::delete('/{id}', [ClassesController::class, 'delete']);
         Route::post('/new', [ClassesController::class, 'new']);
@@ -112,6 +115,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::prefix('roles')->group(function () {
+        Route::get('/fulllist', [RolesController::class, 'listFull']);
         Route::get('/', [RolesController::class, 'list']);
         Route::get('/{id}', [RolesController::class, 'getOne']);
         Route::put('/{id}', [RolesController::class, 'put']);
@@ -142,6 +146,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{id}', [QuestionBankController::class, 'getOne']);
         Route::put('/{id}', [QuestionBankController::class, 'put']);
         Route::delete('/{id}', [QuestionBankController::class, 'delete']);
+    });
+
+    Route::prefix('point-submit')->group(function () {
+        Route::get('/', [PointSubmitController::class, 'list']);
+        Route::post('/new', [PointSubmitController::class, 'new']);
+        Route::get('/{id}', [PointSubmitController::class, 'getOne']);
+        Route::put('/{id}', [PointSubmitController::class, 'put']);
+        Route::delete('/{id}', [PointSubmitController::class, 'delete']);
     });
 });
 
