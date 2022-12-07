@@ -11,14 +11,9 @@ class PointSubmit extends Model
     protected $table = "point_submit";
     protected $guarded = [];
 
-    public function pointSubmitable()
+    public function pointsubmitable()
     {
         return $this->morphTo();
     }
-
-    // public function pointSubmitable()
-    // {
-    //     return $this->morphTo();
-    // }
 
 }

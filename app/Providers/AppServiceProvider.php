@@ -7,6 +7,7 @@ use App\Models\Document;
 use App\Models\DocumentGroup;
 use App\Models\Lab;
 use App\Models\Major;
+use App\Models\PointSubmit;
 use App\Models\Quiz;
 use App\Models\Subject;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -40,6 +41,7 @@ class AppServiceProvider extends ServiceProvider
             'subjects' => Subject::class,
             'documents' => Document::class,
             'majors' => Major::class,
+            'point_submit' => PointSubmit::class,
             'documents_group' => DocumentGroup::class
         ]);
     }

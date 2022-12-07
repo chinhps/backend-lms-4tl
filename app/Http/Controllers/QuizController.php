@@ -2,14 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\QuestionResource;
 use App\Http\Resources\QuizWorkingResource;
 use App\Models\Course;
 use App\Models\PointSubmit;
 use App\Models\QuestionBank;
 use App\Models\Quiz;
 use Carbon\Carbon;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
@@ -24,6 +22,11 @@ class QuizController extends Controller
         $listAnswers = $request->input('listAnswers');
         
         $data_point = PointSubmit::find($id_point);
+
+        // $now = Carbon::now();
+        // if($quiz->deadlines->time_end < $now) {
+        //     return BaseResponse::ResWithStatus("Hết thời gian làm bài!", 403);
+        // }
 
         if($data_point->status == 1) {
             return BaseResponse::ResWithStatus("Bạn đã nộp bài trước đó!", 403);
