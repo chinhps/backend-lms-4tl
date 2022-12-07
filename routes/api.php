@@ -48,6 +48,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
         # lấy bài quiz
         Route::post('/quiz', [QuizController::class, 'joinQuiz']);
+        # nộp bài quiz 
+        Route::post('/quiz/done', [QuizController::class, 'submit_quiz']);
+
 
         Route::get('/joined', [CourseJoinedController::class, 'getMyCourse']);
         # tham gia khóa học

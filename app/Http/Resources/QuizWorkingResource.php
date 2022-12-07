@@ -10,6 +10,7 @@ class QuizWorkingResource extends JsonResource
     {
         return [
             'id' => $this['data']['info_quiz']['id'],
+            'id_point' => $this['data']['info_quiz']['point_submit'][0]['id'] ?? $this['data']['info_quiz']['id_point'],
             'name' => $this['data']['info_quiz']['name'],
             'slug' => $this['data']['info_quiz']['slug'],
             'time_working' => $this['data']['info_quiz']['deadlines']['max_time_working'],

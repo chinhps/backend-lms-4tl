@@ -18,6 +18,67 @@ use Illuminate\Support\Facades\DB;
 class QuizController extends Controller
 {
 
+    public function submit_quiz(Request $request)
+    {
+        $id_point = $request->input('id_point');
+        $listAnswers = $request->input('listAnswers');
+        
+        $data_point = PointSubmit::find($id_point);
+
+        if($data_point->status == 1) {
+            return BaseResponse::ResWithStatus("Bạn đã nộp bài trước đó!", 403);
+        }
+
+        $questions = json_decode($data_point->content,true);
+        usort($questions, fn($a, $b) => $a['question_bank_id'] <=> $b['question_bank_id']);
+        foreach ($listAnswers as $key => $answer) {
+            $questions[$key]['chooses'] = $answer;
+        }
+        $data_point->content = json_encode($questions);
+        $data_point->status = 1;
+        # tính điểm
+        $point = $this->check_mark($questions); 
+        $data_point->point = $point;
+        $data_point->save();
+
+        return BaseResponse::point("Nộp bài thành công!",$point, 200);
+    }
+
+    private function check_mark($list_question) {
+
+        $mark = 0;
+        $list_id = Arr::pluck($list_question, 'question_bank_id');
+        $data_questions = QuestionBank::whereIn('id',$list_id)->get();
+
+        foreach ($data_questions as $data_question) {
+            $answers = collect(json_decode($data_question->answers,true))->map(function ($item) {
+                if($item['isCorrect']) {
+                    return $item['id'];
+                }
+            })->toArray(); 
+
+            # xóa cái element null
+            $answers = Arr::flatten(array_filter($answers, fn($value) => !is_null($value) && $value !== ''));
+            
+            # lặp để lấy câu hỏi trùng id để kiểm tra
+            foreach ($list_question as $question) {
+                # không có câu trả lời thì bỏ qua
+                if($question['chooses'] == []) {
+                    continue;
+                }
+                # trùng id
+                if($question['question_bank_id'] == $data_question->id) {
+                    if($question['chooses'] == $answers) {
+                        $mark += 1;
+                    }
+                }
+            }
+        }
+
+        return $mark * 10 /count($list_question);
+
+    }
+
     public function joinQuiz(Request $request)
     {
         $password = $request->input('password') ?? null;
@@ -32,6 +93,18 @@ class QuizController extends Controller
 
         if ($quiz->deadlines->password != null && $password != $quiz->deadlines->password) {
             return BaseResponse::ResWithStatus("Mật khẩu sai không thể làm bài!", 403);
+        }
+
+        # kiểm tra xem còn trong thời gian deadline hay không
+        $now = Carbon::now();
+        if($quiz->deadlines->time_end < $now) {
+            return BaseResponse::ResWithStatus("Hết thời gian làm bài!", 403);
+        }
+
+        # kiểm tra gần tới deadline mới làm bài (thời gian hiện tại + thời gian làm bài > thời gian deadline)
+        if($now->addSecond($quiz->deadlines->max_time_working) > $quiz->deadlines->time_end) {
+            # tính lại thời gian còn lại
+            $quiz->deadlines->max_time_working = strtotime($quiz->deadlines->time_end) - strtotime($quiz->deadlines->max_time_working);
         }
 
         # lấy bài làm của sinh viên đang đăng nhập
@@ -56,6 +129,7 @@ class QuizController extends Controller
             # lục ngân hàng câu hỏi để lấy
             $list_question = QuestionBank::where('subject_id', $quiz->quizable->subject_id ?? $quiz->quizable->id)
                 ->where('level', $quiz->level)
+                ->orderBy('id','asc')
                 ->inRandomOrder()
                 ->take($quiz->deadlines->questions)
                 ->get();
@@ -66,7 +140,7 @@ class QuizController extends Controller
 
             $course = Course::where('slug', $slug_course)->first();
             # lưu kết quả làm bài của sinh viên
-            $quiz->point_submit()->create([
+            $new_point = $quiz->point_submit()->create([
                 'user_id' => Auth::id(),
                 'course_id' => $course->id ?? 0,
                 'content' => json_encode($list_question->map(function ($item) {
@@ -78,16 +152,21 @@ class QuizController extends Controller
                 'point' => 0,
                 'status' => 0, # đang làm
             ]);
+            $quiz->id_point = $new_point->id;
         } else {
             $now = Carbon::now();
             $point_submit_working = $point_submit[0];
             $re_list_questions = Arr::pluck(json_decode($point_submit_working->content, true), 'question_bank_id');
             # hiển thị lại câu hỏi cũ
-            $list_question = QuestionBank::whereIn('id',$re_list_questions)->get();
+            $list_question = QuestionBank::whereIn('id',$re_list_questions)->orderBy('id','asc')->get();
 
             $check_time = $quiz->deadlines->max_time_working - (strtotime($now) - strtotime($point_submit_working->created_at));
             if($check_time <= 1) {
-                return BaseResponse::ResWithStatus("Hết thời gian làm bài!", 403);
+                # cập nhật trạng thái đã làm xong bài nếu hết thời gian bài đang làm
+                $point_submit_working->update([
+                    "status" => 1
+                ]);
+                return BaseResponse::ResWithStatus("Hết thời gian bài đang làm!", 403);
             }
             $quiz->deadlines->max_time_working = $check_time;
         }
