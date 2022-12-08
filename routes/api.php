@@ -33,6 +33,7 @@ Route::post('auth/get-google-sign-in-url', [LoginGoogleController::class, 'getGo
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('user/get-me', [AuthController::class, 'getme']);
     Route::get('user/logout', [AuthController::class, 'logout']);
+    Route::put('user/change-password', [AuthController::class, 'change_password']);
 
     # cây thư mục
     Route::prefix('/news')->group(function () {
