@@ -27,8 +27,9 @@ class NewsController extends Controller
     public function new(Request $request)
     {
         try {
+            $path = $request->file('thumb')->store('../../../public');
             $data = DB::table('news')->insert([
-                'thumb' => $request->thumb,
+                'thumb' => $path,
                 'user_id' => $request->user_id,
                 'title' => $request->title,
                 'content' => $request->content,
