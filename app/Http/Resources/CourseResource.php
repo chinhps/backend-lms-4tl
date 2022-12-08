@@ -33,12 +33,15 @@ class CourseResource extends JsonResource
                 ];
             }),
             "labs" => collect($this['labs'])->map(function ($item) {
+                $point_submit = collect($item['point_submit'])->map(function ($item) {
+                    return count(json_decode($item['content'],true));
+                });
                 return [
                     "name" => $item['name'],
                     "level" => $item['level'],
                     "slug" => $item['slug'],
                     "max_working" => $item['deadlines']['max_working'] ?? 0,
-                    "count_submit" => count($item['point_submit']) ?? 0,
+                    "count_submit" => $point_submit,
                     "deadlines" => [
                         "time_end" => $item['deadlines']['time_end'] ?? null,
                         "time_start" => $item['deadlines']['time_start'] ?? null
