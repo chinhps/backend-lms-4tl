@@ -8,6 +8,7 @@ use App\Models\CourseJoined;
 use App\Models\Subject;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class CoursesController extends Controller
@@ -30,7 +31,7 @@ class CoursesController extends Controller
             'labs.point_submit'
         )->find($data->subject_id);
 
-        return CourseResource::collection([
+        $courseResource = [
             "data" => [
                 'courses' => $data,
                 'student_joined' => $data->course_joined,
@@ -38,7 +39,33 @@ class CoursesController extends Controller
                 'labs' => [...$data->labs, ...$subject->labs],
                 'quizs' => [...$data->quizs, ...$subject->quizs],
             ]
-        ]);
+        ];
+        $count_course_joined = $data->course_joined()->count();
+
+
+        $role_code = Auth::user()->role->role_code;
+        if($role_code == 'LECTURER') {
+            foreach ($courseResource['data']['labs'] as $lab) {
+                $courseResource['data']['data_lecturer_lab'][] = [
+                    "slug" => $lab->slug,
+                    "student_worked" => $lab->point_submit()->orderBy('user_id')->count(),
+                    "count_student" => $count_course_joined,
+                    "max_working" => ($lab->deadlines) ? $lab->deadlines->max_working : 0,
+                ];
+            }
+
+            foreach ($courseResource['data']['quizs'] as $quiz) {
+                $courseResource['data']['data_lecturer_quiz'][] = [
+                    "slug" => $quiz->slug,
+                    "student_worked" => $quiz->point_submit()->orderBy('user_id')->count(),
+                    "count_student" => $count_course_joined,
+                    "max_working" => ($quiz->deadlines) ? $quiz->deadlines->max_working : 0,
+                ];
+            }
+            
+        }
+
+        return CourseResource::collection($courseResource);
     }
     public function list()
     {

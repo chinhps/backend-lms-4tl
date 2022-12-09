@@ -32,6 +32,8 @@ class CourseResource extends JsonResource
                     "slug" => $item['slug'],
                 ];
             }),
+            "data_lecturer_lab" => $this['data_lecturer_lab'] ?? null,
+            "data_lecturer_quiz" => $this['data_lecturer_quiz'] ?? null,
             "labs" => collect($this['labs'])->map(function ($item) {
                 $point_submit = collect($item['point_submit'])->map(function ($item) {
                     return count(json_decode($item['content'],true));
