@@ -32,41 +32,8 @@ class CourseResource extends JsonResource
                     "slug" => $item['slug'],
                 ];
             }),
-            "data_lecturer_lab" => $this['data_lecturer_lab'] ?? null,
-            "data_lecturer_quiz" => $this['data_lecturer_quiz'] ?? null,
-            "labs" => collect($this['labs'])->map(function ($item) {
-                $point_submit = collect($item['point_submit'])->map(function ($item) {
-                    return count(json_decode($item['content'],true));
-                });
-                return [
-                    "name" => $item['name'],
-                    "level" => $item['level'],
-                    "slug" => $item['slug'],
-                    "max_working" => $item['deadlines']['max_working'] ?? 0,
-                    "count_submit" => $point_submit,
-                    "deadlines" => [
-                        "time_end" => $item['deadlines']['time_end'] ?? null,
-                        "time_start" => $item['deadlines']['time_start'] ?? null
-                    ],
-                    "config" => $item['deadlines'] ? true : false,
-                    "password" => (isset($item['deadlines']) && $item['deadlines']['password'] != null && $item['deadlines'] != '') ? true : false
-                ];
-            }),
-            "quizs" => collect($this['quizs'])->map(function ($item) {
-                return [
-                    "name" => $item['name'],
-                    "level" => $item['level'],
-                    "slug" => $item['slug'],
-                    "max_working" => $item['deadlines']['max_working'] ?? 0,
-                    "count_submit" => count($item['point_submit']) ?? 0,
-                    "deadlines" => [
-                        "time_end" => $item['deadlines']['time_end'] ?? null,
-                        "time_start" => $item['deadlines']['time_start'] ?? null
-                    ],
-                    "config" => $item['deadlines'] ? true : false,
-                    "password" => (isset($item['deadlines']) && $item['deadlines']['password'] != null && $item['deadlines'] != '') ? true : false
-                ];
-            }),
+            "labs" => QuizLabItemResource::collection($this['labs']),
+            "quizs" => QuizLabItemResource::collection($this['quizs']),
         ];
     }
 }

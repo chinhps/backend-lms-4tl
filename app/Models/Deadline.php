@@ -9,4 +9,5 @@ class Deadline extends Model
 {
     use HasFactory;
     protected $table = "deadlines";
+    protected $guarded = ['id'];
 }

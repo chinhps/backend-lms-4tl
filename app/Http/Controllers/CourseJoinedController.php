@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\CourseJoinedResource;
+use App\Models\Course;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -9,6 +11,14 @@ use Illuminate\Support\Facades\DB;
 
 class CourseJoinedController extends Controller
 {
+
+    public function getListByCourse($slug)
+    {
+        $data = Course::with('course_joined.user.role')->where('slug', $slug)->first();
+        // return $data->course_joined;
+        return CourseJoinedResource::collection($data->course_joined);
+    }
+
     public function getMyCourse(Request $request)
     {
         $limit = $request->limit ?? 3;
@@ -22,9 +32,9 @@ class CourseJoinedController extends Controller
     }
 
     public function joinCourse(Request $request)
-    {   
+    {
 
-        $data = DB::table('courses')->where('id',$request->idCourse)->first();
+        $data = DB::table('courses')->where('id', $request->idCourse)->first();
         try {
             DB::table('course_joined')->insert([
                 'course_id' => $request->idCourse,
@@ -37,7 +47,7 @@ class CourseJoinedController extends Controller
             ]);
         } catch (Exception $e) {
             return response()->json([
-                'status' => 201, 
+                'status' => 201,
                 'slug' => $data->slug,
                 'msg' => 'Đã tham gia khóa học!'
             ]);

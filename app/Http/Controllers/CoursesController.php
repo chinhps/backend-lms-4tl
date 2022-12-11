@@ -16,6 +16,7 @@ class CoursesController extends Controller
     public function showDocQuizLab($slug)
     {
 
+        # lấy Quiz, Lab, sinh viên tham gia khóa học
         $data = Course::with(
             'quizs.deadlines',
             'quizs.point_submit',
@@ -24,6 +25,7 @@ class CoursesController extends Controller
             'course_joined'
         )->where('slug', $slug)->first();
 
+        # lấy thêm bài Quiz + Lab nếu là mặc định phải có
         $subject = Subject::with(
             'quizs.deadlines',
             'quizs.point_submit',
@@ -31,6 +33,7 @@ class CoursesController extends Controller
             'labs.point_submit'
         )->find($data->subject_id);
 
+        # lấy những thông tin cơ bản của khóa học
         $courseResource = [
             "data" => [
                 'courses' => $data,
@@ -40,39 +43,55 @@ class CoursesController extends Controller
                 'quizs' => [...$data->quizs, ...$subject->quizs],
             ]
         ];
+
+        # giảng viên lấy thêm thông tin sinh viên đã làm bài
         $count_course_joined = $data->course_joined()->count();
-
-
         $role_code = Auth::user()->role->role_code;
-        if($role_code == 'LECTURER') {
+        if ($role_code == 'LECTURER') {
+
+            $data_lecturer_lab = [];
+            $data_lecturer_quiz = [];
+
             foreach ($courseResource['data']['labs'] as $lab) {
-                $courseResource['data']['data_lecturer_lab'][] = [
-                    "slug" => $lab->slug,
+                $data_lecturer_lab[] = [
+                    "type" => "lab",
                     "student_worked" => $lab->point_submit()->orderBy('user_id')->count(),
                     "count_student" => $count_course_joined,
-                    "max_working" => ($lab->deadlines) ? $lab->deadlines->max_working : 0,
                 ];
             }
 
             foreach ($courseResource['data']['quizs'] as $quiz) {
-                $courseResource['data']['data_lecturer_quiz'][] = [
-                    "slug" => $quiz->slug,
+                $data_lecturer_quiz[] = [
+                    "type" => "quiz",
                     "student_worked" => $quiz->point_submit()->orderBy('user_id')->count(),
                     "count_student" => $count_course_joined,
-                    "max_working" => ($quiz->deadlines) ? $quiz->deadlines->max_working : 0,
                 ];
             }
-            
-        }
 
+            # merge thông tin giảng viên và với thông tin khóa học
+            $labs = [];
+            foreach ($data_lecturer_lab as $key => $lab_value) {
+                $labs[] = [...$courseResource['data']['labs'][$key]->toArray(), ...$lab_value];
+            }
+            $quizs = [];
+            foreach ($data_lecturer_quiz as $key => $quiz_value) {
+                $quizs[] = [...$courseResource['data']['quizs'][$key]->toArray(), ...$quiz_value];
+            }
+
+            $courseResource['data']['labs'] = $labs;
+            $courseResource['data']['quizs'] = $quizs;
+        }
+        # transform data trước khi trả về
         return CourseResource::collection($courseResource);
     }
+
     public function list()
     {
         $data = DB::table('courses')->join('subjects', 'courses.subject_id', '=', 'subjects.id')
             ->selectRaw('courses.name as course_name, subjects.name as subject_name, courses.id, courses.subject_id, courses.class_code, courses.status')->orderBy('id', 'desc')->paginate(10);
         return response()->json($data);
     }
+
     public function new(Request $request)
     {
         try {
@@ -82,8 +101,6 @@ class CoursesController extends Controller
                 'name' => $request->name,
                 'status' => $request->status
             ]);
-
-
             return response()->json(["msg" => "Thêm thành công!"]);
         } catch (Exception $e) {
             return response()->json($e, 500);

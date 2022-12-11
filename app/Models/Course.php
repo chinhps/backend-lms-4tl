@@ -15,6 +15,11 @@ class Course extends Model
         return $this->morphMany(Quiz::class, 'quizable');
     }
 
+    public function subject()
+    {
+        return $this->hasOne(Subject::class,'id','subject_id');
+    }
+
     public function labs()
     {
         return $this->morphMany(Lab::class, 'labable');

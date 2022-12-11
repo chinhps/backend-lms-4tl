@@ -6,19 +6,24 @@ use App\Http\Controllers\CoursesController;
 use App\Http\Controllers\CourseStudentController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\ClassesController;
-use App\Http\Controllers\LabController;
+use App\Http\Controllers\DeadLineController;
+use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\MajorController;
-use App\Http\Controllers\QuizController;
-use App\Http\Controllers\MessagesController;
-use App\Http\Controllers\NewsController;
-use App\Http\Controllers\QuestionBankController;
-use App\Http\Controllers\RolesController;
+use App\Http\Controllers\{
+    MessagesController, 
+    QuizController, 
+    NewsController, 
+    QuestionBankController, 
+    RolesController, 
+    LabController
+};
 use App\Http\Controllers\LoginWith\LoginGoogleController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PermissionGroupController;
 use App\Http\Controllers\PointSubmitController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\UserController;
+use App\Models\PointSubmit;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
@@ -49,16 +54,50 @@ Route::middleware('auth:sanctum')->group(function () {
     # khóa học
     Route::prefix('/course')->group(function () {
 
-        # lấy bài quiz
-        Route::post('/quiz', [QuizController::class, 'joinQuiz']);
-        # nộp bài quiz 
-        Route::post('/quiz/done', [QuizController::class, 'submit_quiz']);
+        Route::prefix('/students')->group(function () {
+            Route::get('/{slug}', [CourseJoinedController::class, 'getListByCourse']);
+        });
 
-        # lấy bài lab
-        Route::post('/lab', [LabController::class, 'joinLab']);
-        # nộp bài lab 
-        Route::post('/lab/done', [LabController::class, 'submit_lab']);
+        Route::prefix('/quiz')->group(function () {
+            # lấy bài quiz
+            Route::post('/', [QuizController::class, 'joinQuiz']);
+            Route::get('/{slug}', [QuizController::class, 'getOne']);
+            # xóa
+            Route::delete('/{slug}', [QuizController::class, 'delete']);
+            # nộp bài quiz 
+            Route::post('/done', [QuizController::class, 'submit_quiz']);
+            # tạo mới
+            Route::post('/create', [QuizController::class, 'upsert']);
+        });
 
+        Route::prefix('/lab')->group(function () {
+            # lấy bài lab
+            Route::post('/', [LabController::class, 'joinLab']);
+            Route::get('/{slug}', [LabController::class, 'getOne']);
+            # xóa
+            Route::delete('/{slug}', [LabController::class, 'delete']);
+            # nộp bài lab 
+            Route::post('/done', [LabController::class, 'submit_lab']);
+            # tạo mới
+            Route::post('/create', [LabController::class, 'upsert']);
+        });
+
+        Route::prefix('/document')->group(function () {
+            Route::get('/{slug}', [DocumentController::class, 'getOne']);
+            # xóa
+            Route::delete('/{slug}', [DocumentController::class, 'delete']);
+            # tạo mới
+            Route::post('/create', [DocumentController::class, 'upsert']);
+        });
+
+        Route::prefix('/deadline')->group(function () {
+            Route::get('/{type}/{slug}', [DeadLineController::class, 'getOne']);
+            Route::post('/create', [DeadLineController::class, 'upsert']);
+        });
+
+        Route::prefix('/point-submits')->group(function () {
+            Route::get('/{slug}', [PointSubmit::class, 'getListSlug']);
+        });
 
         Route::get('/joined', [CourseJoinedController::class, 'getMyCourse']);
         # tham gia khóa học
@@ -165,9 +204,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
 Route::get('/create-slug', function () {
-    $data = DB::table('quizs')->get();
+    $data = DB::table('documents')->get();
     foreach ($data as $vl) {
-        DB::table('quizs')->where('id', $vl->id)->update([
+        DB::table('documents')->where('id', $vl->id)->update([
             'slug' => Str::slug($vl->name . '-' . Str::random(4))
         ]);
     }
