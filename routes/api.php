@@ -99,7 +99,10 @@ Route::middleware('auth:sanctum')->group(function () {
         });
 
         Route::prefix('/point-submits')->group(function () {
-            Route::get('/{slug}', [PointSubmit::class, 'getListSlug']);
+            Route::get('/{type}/{slug}', [PointSubmitController::class, 'getListSlug']);
+            # chấm điểm
+            Route::get('/{id}', [PointSubmitController::class, 'getOneFormat']);
+            Route::post('/mark', [PointSubmitController::class, 'mark']);
         });
 
         Route::get('/joined', [CourseJoinedController::class, 'getMyCourse']);

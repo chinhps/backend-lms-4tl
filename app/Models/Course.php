@@ -17,7 +17,7 @@ class Course extends Model
 
     public function subject()
     {
-        return $this->hasOne(Subject::class,'id','subject_id');
+        return $this->hasOne(Subject::class, 'id', 'subject_id');
     }
 
     public function labs()
@@ -35,4 +35,8 @@ class Course extends Model
         return $this->hasMany(CourseJoined::class);
     }
 
+    public function point_submits()
+    {
+        return $this->hasMany(PointSubmit::class, 'course_id', 'id');
+    }
 }
