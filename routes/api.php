@@ -6,6 +6,7 @@ use App\Http\Controllers\CoursesController;
 use App\Http\Controllers\CourseStudentController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\ClassesController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LabController;
 use App\Http\Controllers\MajorController;
 use App\Http\Controllers\QuizController;
@@ -38,6 +39,8 @@ Route::middleware('auth:sanctum')->group(function () {
     # cây thư mục
     Route::prefix('/news')->group(function () {
         Route::get('/', [NewsController::class, 'getAll']);
+        Route::get('/{id}', [NewsController::class, 'getOne']);
+
         Route::post('/new', [NewsController::class, 'new']);
     });
 
@@ -160,6 +163,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{id}', [PointSubmitController::class, 'getOne']);
         Route::put('/{id}', [PointSubmitController::class, 'put']);
         Route::delete('/{id}', [PointSubmitController::class, 'delete']);
+    });
+
+    Route::prefix('dashboard')->group(function () {
+        Route::get('/', [DashboardController::class, 'dashboard']);
     });
 });
 

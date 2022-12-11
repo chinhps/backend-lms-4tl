@@ -15,6 +15,7 @@ class NewsController extends Controller
         $data = DB::table('news')->take($limit)->get();
         return response()->json($data);
     }
+
     public function delete(Request $request)
     {
         try {
@@ -32,7 +33,7 @@ class NewsController extends Controller
             $file->move(public_path('files'), $name);
 
             $data = DB::table('news')->insert([
-                'thumb' => env('APP_URL').'/files/'. $name,
+                'thumb' => env('APP_URL') . '/files/' . $name,
                 'user_id' => $request->user_id,
                 'title' => $request->title,
                 'content' => $request->content,
