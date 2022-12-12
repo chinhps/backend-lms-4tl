@@ -2,15 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\QuizExport;
 use App\Http\Resources\PointSubmitResource;
 use App\Models\Course;
 use App\Models\PointSubmit;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class PointSubmitController extends Controller
 {
+    public function export($type)
+    {
+        // return Excel::store(new QuizExport(), 'invoices.xlsx');
+        // return Excel::download(new QuizExport, 'users.xlsx');
+    }
     public function getOneFormat($id)
     {
         $data = PointSubmit::with('user')->find($id);

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\LoginWith;
 
+use App\Http\Controllers\BaseResponse;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -25,15 +26,11 @@ class LoginGoogleController extends Controller
                 Auth::login($user,true);
                 return $request->user();
             } else {
-                throw new \Exception(__('Không tồn tại tài khoản gmail này'));
+                return BaseResponse::ResWithStatus("Không có tài khoản này trên hệ thống!",403);
             }
 
         } catch (\Exception $exception) {
-            return response()->json([
-                'status' => __('google sign in failed'),
-                'error' => $exception,
-                'message' => $exception->getMessage()
-            ], Response::HTTP_BAD_REQUEST);
+            return BaseResponse::ResWithStatus("Lỗi từ phía Google! Vui lòng thử lại!",403);
         }
     }
 

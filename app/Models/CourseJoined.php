@@ -15,4 +15,9 @@ class CourseJoined extends Model
         return $this->hasOne(User::class,'id','user_id');
     }
 
+    public function course()
+    {
+        return $this->hasOne(Course::class,'id','course_id');
+    }
+
 }

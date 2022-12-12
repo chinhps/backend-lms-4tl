@@ -39,4 +39,9 @@ class Course extends Model
     {
         return $this->hasMany(PointSubmit::class, 'course_id', 'id');
     }
+
+    public function messages()
+    {
+        return $this->hasMany(Message::class,'course_id','id');
+    }
 }

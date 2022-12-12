@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\CourseJoined;
 use Illuminate\Support\Facades\Broadcast;
 
 /*
@@ -13,6 +14,11 @@ use Illuminate\Support\Facades\Broadcast;
 |
 */
 
-Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
-    return (int) $user->id === (int) $id;
+Broadcast::channel('room.{idRoom}', function ($user, $idRoom) {
+    return true;
 });
+// Broadcast::channel('room.{id}', function ($user, $id) {
+//     // $data = CourseJoined::where('user_id', $user->id)->where('course_id', $id)->first();
+//     return true;//($data) ? true : false;
+// });
+// Broadcast::routes(['middleware' => ['auth:sanctum']]);

@@ -10,8 +10,8 @@ use App\Http\Controllers\DeadLineController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MajorController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\{
-    MessagesController, 
     QuizController, 
     NewsController, 
     QuestionBankController, 
@@ -25,21 +25,33 @@ use App\Http\Controllers\PointSubmitController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\UserController;
 use App\Models\PointSubmit;
+use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
+
 
 # người dùng
 Route::post('auth/login', [AuthController::class, 'Login'])->name('login');
 Route::post('auth/register', [AuthController::class, 'Register']);
 Route::get('auth/callback', [LoginGoogleController::class, 'callback']);
 Route::post('auth/get-google-sign-in-url', [LoginGoogleController::class, 'getGoogleSignInUrl']);
+Broadcast::routes(['middleware' => ['auth:sanctum']]);
+
+
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('user/get-me', [AuthController::class, 'getme']);
     Route::get('user/logout', [AuthController::class, 'logout']);
     Route::put('user/change-password', [AuthController::class, 'change_password']);
+
+    # chat
+    Route::prefix('/chat')->group(function () {
+        Route::post('/my-room', [ChatController::class, 'my_room']);
+        Route::post('/send', [ChatController::class, 'send']);
+        Route::get('/{slug}', [ChatController::class, 'list_message']);
+    });
 
     # cây thư mục
     Route::prefix('/news')->group(function () {
@@ -99,10 +111,11 @@ Route::middleware('auth:sanctum')->group(function () {
         });
 
         Route::prefix('/point-submits')->group(function () {
-            Route::get('/{type}/{slug}', [PointSubmitController::class, 'getListSlug']);
+            Route::get('/list/{type}/{slug}', [PointSubmitController::class, 'getListSlug']);
             # chấm điểm
             Route::get('/{id}', [PointSubmitController::class, 'getOneFormat']);
             Route::post('/mark', [PointSubmitController::class, 'mark']);
+            Route::get('/export/{type}', [PointSubmitController::class, 'export']);
         });
 
         Route::get('/joined', [CourseJoinedController::class, 'getMyCourse']);
@@ -115,7 +128,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
     Route::get('/labs', [LabController::class, 'list']);
-    Route::get('/get-user-message', [MessagesController::class, 'GetMessage']);
 
     # acac
     Route::get('/users', [UserController::class, 'list']);
