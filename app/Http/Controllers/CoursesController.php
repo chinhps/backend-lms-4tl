@@ -13,25 +13,58 @@ use Illuminate\Support\Facades\DB;
 
 class CoursesController extends Controller
 {
-    public function showDocQuizLab($slug)
-    {
 
+    public function getQuizLabCourse($slug, $role = 'LECTURER')
+    {
         # lấy Quiz, Lab, sinh viên tham gia khóa học
-        $data = Course::with(
-            'quizs.deadlines',
-            'quizs.point_submit',
-            'labs.deadlines',
-            'labs.point_submit',
-            'course_joined'
+        $course = Course::with(
+            [
+                'quizs.deadlines',
+                'quizs.point_submit' => function ($query) use ($role) {
+                    $role == 'STUDENT' ? $query->where('user_id', Auth::id()) : null;
+                },
+                'labs.deadlines',
+                'labs.point_submit' => function ($query) use ($role) {
+                    $role == 'STUDENT' ? $query->where('user_id', Auth::id()) : null;
+                },
+                'course_joined'
+            ]
         )->where('slug', $slug)->first();
 
         # lấy thêm bài Quiz + Lab nếu là mặc định phải có
         $subject = Subject::with(
-            'quizs.deadlines',
-            'quizs.point_submit',
-            'labs.deadlines',
-            'labs.point_submit'
-        )->find($data->subject_id);
+            [
+                'quizs.deadlines',
+                'quizs.point_submit' => function ($query) use ($role) {
+                    $role == 'STUDENT' ? $query->where('user_id', Auth::id()) : null;
+                },
+                'labs.deadlines',
+                'labs.point_submit' => function ($query) use ($role) {
+                    $role == 'STUDENT' ? $query->where('user_id', Auth::id()) : null;
+                },
+            ]
+        )->find($course->subject_id);
+
+        $list_quiz = [...$course->quizs, ...$subject->quizs];
+        usort($list_quiz, function ($a, $b) {
+            return $a['level'] <=> $b['level'];
+        });
+
+        $list_lab = [...$course->labs, ...$subject->labs];
+        usort($list_lab, function ($a, $b) {
+            return $a['level'] <=> $b['level'];
+        });
+
+        return [$course, $subject, $list_quiz, $list_lab];
+    }
+
+
+    public function showDocQuizLab($slug)
+    {
+
+        $role_code = Auth::user()->role->role_code;
+        # lấy Quiz, Lab, sinh viên
+        list($data, $subject, $list_quiz, $list_lab) = $this->getQuizLabCourse($slug,$role_code);
 
         # lấy những thông tin cơ bản của khóa học
         $courseResource = [
@@ -39,14 +72,13 @@ class CoursesController extends Controller
                 'courses' => $data,
                 'student_joined' => $data->course_joined,
                 'documents' => $data->documents,
-                'labs' => [...$data->labs, ...$subject->labs],
-                'quizs' => [...$data->quizs, ...$subject->quizs],
+                'labs' => $list_lab,
+                'quizs' => $list_quiz,
             ]
         ];
 
         # giảng viên lấy thêm thông tin sinh viên đã làm bài
         $count_course_joined = $data->course_joined()->count();
-        $role_code = Auth::user()->role->role_code;
         if ($role_code == 'LECTURER') {
 
             $data_lecturer_lab = [];

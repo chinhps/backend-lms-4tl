@@ -115,7 +115,7 @@ Route::middleware('auth:sanctum')->group(function () {
             # chấm điểm
             Route::get('/{id}', [PointSubmitController::class, 'getOneFormat']);
             Route::post('/mark', [PointSubmitController::class, 'mark']);
-            Route::get('/export/{type}', [PointSubmitController::class, 'export']);
+            Route::get('/export/{type}/{slug}', [PointSubmitController::class, 'export']);
         });
 
         Route::get('/joined', [CourseJoinedController::class, 'getMyCourse']);

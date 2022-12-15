@@ -31,6 +31,7 @@ class QuizController extends Controller
         $data = Quiz::where('slug', $slug)->first();
         return new QuizResource($data);
     }
+
     public function upsert(Request $request)
     {
         $id = $request->input('id') ?? null;
@@ -175,7 +176,7 @@ class QuizController extends Controller
             'user_id' => Auth::id(),
             'status' => 0
         ])->get();
-
+        
         # không có bài đang làm và chưa đạt giới hạn thì tạo mới
         if (count($point_submit) == 0) {
 
@@ -222,6 +223,7 @@ class QuizController extends Controller
                 return BaseResponse::ResWithStatus("Hết thời gian bài đang làm!", 403);
             }
             $quiz->deadlines->max_time_working = $check_time;
+            $quiz->id_point = ($point_submit[0])->id;
         }
 
         return new QuizWorkingResource([

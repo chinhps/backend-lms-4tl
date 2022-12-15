@@ -9,7 +9,7 @@ class PointSubmit extends Model
 {
     use HasFactory;
     protected $table = "point_submit";
-    protected $fillable = [];
+    protected $guarded = ['id'];
 
     public function pointsubmitable()
     {

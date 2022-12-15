@@ -23,6 +23,6 @@ class Lab extends BaseModel
 
     public function point_submit()
     {
-        return $this->morphMany(PointSubmit::class, 'pointsubmitable');
+        return $this->morphOne(PointSubmit::class, 'pointsubmitable');
     }
 }

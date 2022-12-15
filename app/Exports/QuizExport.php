@@ -2,16 +2,33 @@
 
 namespace App\Exports;
 
+use App\Models\Course;
 use App\Models\PointSubmit;
-use Maatwebsite\Excel\Concerns\FromCollection;
+use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Concerns\FromView;
 
-class QuizExport implements FromCollection
+class QuizExport implements FromView
 {
-    /**
-    * @return \Illuminate\Support\Collection
-    */
-    public function collection()
+    public function __construct(public $type, public $slug)
     {
-        return PointSubmit::get();
+    }
+    public function view(): View
+    {
+        $type = $this->type;
+        $slug = $this->slug;
+
+        $quizs = Course::with([
+            'point_submits' => function ($query) use ($type) {
+                $query->where('pointsubmitable_type', $type)->orderBy('id', 'desc')
+                    ->groupBy('user_id', 'pointsubmitable_id')->select('*', DB::raw('count(*) as total'))->get();
+            }, 'point_submits.user', 'point_submits.pointsubmitable'
+        ])->where('slug', $slug)->first();
+
+        return $quizs;
+
+        return view('exports.quizByCourse', [
+            'quizs' => $quizs
+        ]);
     }
 }

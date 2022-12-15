@@ -6,6 +6,7 @@ use App\Exports\QuizExport;
 use App\Http\Resources\PointSubmitResource;
 use App\Models\Course;
 use App\Models\PointSubmit;
+use App\Models\Quiz;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -13,11 +14,30 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class PointSubmitController extends Controller
 {
-    public function export($type)
+    public function export($type, $slug)
     {
-        // return Excel::store(new QuizExport(), 'invoices.xlsx');
-        // return Excel::download(new QuizExport, 'users.xlsx');
+        $type = $type == 'quiz' ? 'quizs' : 'labs';
+        $quizs = Course::with('course_joined.course.point_submits')->where('slug', $slug)->first();
+
+        list($data, $subject, $list_quiz, $list_lab) = (new CoursesController)->getQuizLabCourse($slug);
+
+        $point_submit = PointSubmit::with('pointsubmitable.deadlines', 'user')->where([
+            'course_id' => $quizs->id,
+            'pointsubmitable_type' => $type
+        ])->get();
+
+        $res = [
+            'students' => $quizs,
+            'list_quiz' =>  $list_quiz,
+            'quizs' => $point_submit
+        ];
+
+        return $res;
+        return view('exports.quizByCourse',$res);
+        return Excel::download(new QuizExport($type, $slug), 'users.xlsx');
     }
+
+
     public function getOneFormat($id)
     {
         $data = PointSubmit::with('user')->find($id);
@@ -45,7 +65,7 @@ class PointSubmitController extends Controller
     {
         $data = Course::with([
             'point_submits' => function ($query) use ($type) {
-                $query->where('pointsubmitable_type', $type)->orderBy('id','desc')
+                $query->where('pointsubmitable_type', $type)->orderBy('id', 'desc')
                     ->groupBy('user_id', 'pointsubmitable_id')->select('*', DB::raw('count(*) as total'))->get();
             }, 'point_submits.user', 'point_submits.pointsubmitable'
         ])->where('slug', $slug)->first();
