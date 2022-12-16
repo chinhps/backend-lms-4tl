@@ -17,24 +17,31 @@ class PointSubmitController extends Controller
     public function export($type, $slug)
     {
         $type = $type == 'quiz' ? 'quizs' : 'labs';
-        $quizs = Course::with('course_joined.course.point_submits')->where('slug', $slug)->first();
-
+        $quizs = Course::with('course_joined.course')->where('slug', $slug)->first();
         list($data, $subject, $list_quiz, $list_lab) = (new CoursesController)->getQuizLabCourse($slug);
 
-        $point_submit = PointSubmit::with('pointsubmitable.deadlines', 'user')->where([
-            'course_id' => $quizs->id,
-            'pointsubmitable_type' => $type
-        ])->get();
+        $listUser = [];
+
+        foreach ($quizs->course_joined as $student) {
+            $dataPointStudent = collect($list_quiz)->map(function ($quiz) use ($student) {
+                return $quiz->point_submit()->where([
+                    "user_id" => $student->user_id,
+                    "pointsubmitable_type" => 'quizs'
+                ])->get();
+            });
+            $listUser[] = [
+                "user" => $student->user,
+                "points" => $dataPointStudent
+            ];
+        }
 
         $res = [
-            'students' => $quizs,
+            'class' => $data->class_code,
+            'students' => $listUser,
             'list_quiz' =>  $list_quiz,
-            'quizs' => $point_submit
         ];
 
-        return $res;
-        return view('exports.quizByCourse',$res);
-        return Excel::download(new QuizExport($type, $slug), 'users.xlsx');
+        return Excel::download(new QuizExport($res), 'users.xlsx');
     }
 
 

@@ -21,9 +21,8 @@ class QuizLabItemResource extends JsonResource
             "student_worked" => $this['student_worked'],
             "count_student" => $this['count_student'],
             "max_working" => $this['deadlines']['max_working'] ?? 0,
-            "count_submit" => (!is_array($this['point_submit'])) ? collect($this['point_submit'])->count() ?? 0 : collect($this['point_submit'])->map(function ($item) {
-                return !isset($item['content']) ? 9999 : count(json_decode($item['content'], true));
-            }),
+            "count_submit" => (!isset($this['point_submit']['id'])) ? collect($this['point_submit'])->count() ?? 0 :
+                count(json_decode($this['point_submit']['content'],true)),
             "deadlines" => [
                 "time_end" => $this['deadlines']['time_end'] ?? null,
                 "time_start" => $this['deadlines']['time_start'] ?? null
