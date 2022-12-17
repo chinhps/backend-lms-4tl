@@ -16,17 +16,38 @@ class PointSubmitController extends Controller
 {
     public function export($type, $slug)
     {
-        $type = $type == 'quiz' ? 'quizs' : 'labs';
+        $typeFm = $type == 'quiz' ? 'quizs' : 'labs';
         $quizs = Course::with('course_joined.course')->where('slug', $slug)->first();
         list($data, $subject, $list_quiz, $list_lab) = (new CoursesController)->getQuizLabCourse($slug);
 
+        $list = $type == 'quiz' ? $list_quiz : ($type == 'lab' ? $list_lab : [...$list_quiz, ...$list_lab]);
+
+        if ($type == 'all') {
+            $listUser = [
+                'quizs' => $this->getPointFullSubject($quizs, $list_quiz, 'quizs'),
+                'labs' => $this->getPointFullSubject($quizs, $list_lab, 'labs')
+            ];
+        } else {
+            $listUser = $this->getPointFullSubject($quizs, $list, $typeFm);
+        }
+
+        $res = [
+            'class' => ($type == 'quiz' ? 'QUIZ' : ($type == 'quiz' ? 'LAB' : "TẤT CẢ QUIZ & LAB")) . ' ' . $data->class_code,
+            'students' => $listUser,
+            'list' =>  $list,
+        ];
+        return Excel::download(new QuizExport($res), 'users.xlsx');
+    }
+
+    private function getPointFullSubject($quizs, $list, $typeFm)
+    {
         $listUser = [];
 
         foreach ($quizs->course_joined as $student) {
-            $dataPointStudent = collect($list_quiz)->map(function ($quiz) use ($student) {
+            $dataPointStudent = collect($list)->map(function ($quiz) use ($student, $typeFm) {
                 return $quiz->point_submit()->where([
                     "user_id" => $student->user_id,
-                    "pointsubmitable_type" => 'quizs'
+                    "pointsubmitable_type" => $typeFm
                 ])->get();
             });
             $listUser[] = [
@@ -34,16 +55,8 @@ class PointSubmitController extends Controller
                 "points" => $dataPointStudent
             ];
         }
-
-        $res = [
-            'class' => $data->class_code,
-            'students' => $listUser,
-            'list_quiz' =>  $list_quiz,
-        ];
-
-        return Excel::download(new QuizExport($res), 'users.xlsx');
+        return $listUser;
     }
-
 
     public function getOneFormat($id)
     {
