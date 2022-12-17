@@ -9,6 +9,7 @@ class AllBranch extends Model
 {
     use HasFactory;
     protected $table = "all_branch";
+    protected $guarded = ['id'];
 
     public function branchable()
     {

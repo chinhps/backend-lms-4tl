@@ -9,6 +9,7 @@ use App\Models\Major;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Exception;
 
 class BranchController extends Controller
 {
@@ -112,5 +113,60 @@ class BranchController extends Controller
         // }
 
         return response()->json($data);
+    }
+    public function put(Request $request)
+    {
+        try {
+            DB::table('all_branch')->where('id', $request->id)->update([
+                'name' => $request->name,
+                'thumb' => $request->thumb,
+                'parent' => $request->parent,
+                'slug' => Str::slug($request->name . '-' . Str::random(8)),
+            ]);
+            return response()->json(["msg" => "Sửa thành công id $request->id!"]);
+        } catch (Exception $e) {
+            return response()->json($e, 500);
+        }
+    }
+    public function new(Request $request)
+    {
+        try {
+            $data = DB::table('all_branch')->insert([
+                'name' => $request->name,
+                'thumb' => $request->thumb,
+                'parent' => $request->parent,
+                'slug' => Str::slug($request->name . '-' . Str::random(8)),
+            ]);
+            return response()->json(["msg" => "Thêm thành công!"]);
+        } catch (Exception $e) {
+            return response()->json($e, 500);
+        }
+    }
+    public function getOneBySlug(Request $request)
+    {
+        $data = DB::table('all_branch')->where('slug', $request->slug)->first();
+        return response()->json($data);
+    }
+    public function upsert(Request $request)
+    {
+        $id = $request->input('id') ?? null;
+        $name = $request->input('name');
+        $parent = $request->input('parent');
+        $thumb = $request->input('thumb');
+
+        try {
+            $dataUpsert = [
+                'name' => $name,
+                'parent' => $parent,
+                'thumb' => $thumb,
+                'slug' => Str::slug($name . Str::random(8)),
+            ];
+
+            AllBranch::updateOrCreate(['id' => $id], $dataUpsert);
+            return BaseResponse::ResWithStatus($id ? "Sửa thành công!" : 'Tạo mới thành công!', 200);
+        } catch (\Exception $err) {
+            return $err;
+            // return BaseResponse::ResWithStatus($id ? "Có lỗi khi sửa!" : 'Có lỗi xảy ra khi tạo mới!', 500);
+        }
     }
 }

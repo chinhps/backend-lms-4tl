@@ -64,6 +64,8 @@ Route::middleware('auth:sanctum')->group(function () {
     # cây thư mục
     Route::prefix('/branches')->group(function () {
         Route::get('/', [BranchController::class, 'list_parent']);
+        Route::post('/new', [BranchController::class, 'upsert']);
+        Route::get('/{slug}', [BranchController::class, 'getOneBySlug']);
     });
 
     # khóa học
