@@ -38,6 +38,6 @@ class MessageEvent implements ShouldBroadcast
     }
     public function broadcastOn()
     {
-        return new PrivateChannel('room.' . $this->slug);
+        return new PresenceChannel('room.' . $this->slug);
     }
 }
