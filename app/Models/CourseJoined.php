@@ -20,4 +20,9 @@ class CourseJoined extends Model
         return $this->hasOne(Course::class,'id','course_id');
     }
 
+    public function messages()
+    {
+        return $this->hasMany(Message::class,'course_id','course_id');
+    }
+
 }

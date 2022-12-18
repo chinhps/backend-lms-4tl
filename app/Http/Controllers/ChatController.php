@@ -24,23 +24,49 @@ class ChatController extends Controller
         $slug = $request->input('slug');
         $message = $request->input('message');
 
-        Message::create([
+        $dataSave = [
             'user_id' => Auth::id(),
             'course_id' => Course::where('slug', $slug)->value('id'),
             'message' => $message,
             'message_type' => 1
-        ]);
+        ];
 
-        MessageEvent::dispatch($slug, Auth::id(),Auth::user()->name, $message);
+        if ($request->hasfile('image')) {
+            $file = $request->file('image');
+            $name = time() . rand(1, 500) . '.' . $file->extension();
+            $file->move(public_path('image-chat'), $name);
+
+            $dataSave['message'] = json_encode([
+                'message' => $message,
+                'link' => '/image-chat/' . $name
+            ]);
+            $dataSave['message_type'] = 2;
+        }
+
+        Message::create($dataSave);
+
+        MessageEvent::dispatch(
+            $slug,
+            Auth::id(),
+            Auth::user()->name,
+            $dataSave['message_type'] == 1 ? $dataSave['message'] : json_decode($dataSave['message'], true),
+            $dataSave['message_type']
+        );
         return response()->json([
             'status' => 1,
         ]);
     }
     public function my_room(Request $request)
     {
-        $data = CourseJoined::has('course')->with(['course', 'course.messages' => function ($query) {
-            $query->orderBy('id', 'desc')->first();
+
+        // $data = CourseJoined::has('course')->with(['course.messages' => function ($query) {
+        //     $query->orderBy('id', 'desc')->first();
+        // }])->where('user_id', Auth::id())->get();
+        $data = CourseJoined::has('course')->with(['course.subject', 'messages' => function ($query) {
+            $query->orderBy('id', 'desc');
         }])->where('user_id', Auth::id())->get();
+        // return $data;
+
         return ChatRoomResource::collection($data);
     }
 }
