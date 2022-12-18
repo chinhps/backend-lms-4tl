@@ -92,8 +92,11 @@ class LabController extends Controller
             return BaseResponse::ResWithStatus("Hết thời gian nộp bài!", 403);
         }
 
-
-        $count = count(json_decode($lab->point_submit->content, true));
+        if (isset($lab->point_submit->content)) {
+            $count = count(json_decode($lab->point_submit->content, true));
+        } else {
+            $count = 0;
+        }
 
         if ($count >= $lab->deadlines->max_working) {
             return BaseResponse::ResWithStatus("Số File quá giới hạn quy định!", 403);
@@ -127,7 +130,7 @@ class LabController extends Controller
             ]);
             $data_point = PointSubmit::with('pointsubmitable.deadlines')->find($new_point->id);
         }
-        
+
         # kiểm tra xem số lượng file nộp lên nhiều hơn không
         $check_file = json_decode($data_point->content, true);
 
