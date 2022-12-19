@@ -16,7 +16,7 @@ class UploadLabResource extends JsonResource
             'description' => $this['data']['info_lab']['description'],
             'time_working' => $this['data']['info_lab']['deadlines']['max_time_working'],
             'max_working' => $this['data']['info_lab']['deadlines']['max_working'],
-            'uploaded_lab' => json_decode($this['data']['info_lab']['point_submit']['content'] ?? [],true) ?? []
+            'uploaded_lab' => (isset($this['data']['info_lab']['point_submit']['content'])) ? json_decode($this['data']['info_lab']['point_submit']['content'] ?? [], true) : []
         ];
     }
 }

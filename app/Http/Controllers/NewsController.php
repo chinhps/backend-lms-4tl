@@ -33,8 +33,8 @@ class NewsController extends Controller
             $file->move(public_path('files'), $name);
 
             $data = DB::table('news')->insert([
-                'thumb' => env('APP_URL') . '/files/' . $name,
-                'user_id' => $request->user_id,
+                'thumb' => env('APP_URL') . "/files/" . $name,
+                'user_id' => Auth::id(),
                 'title' => $request->title,
                 'content' => $request->content,
             ]);

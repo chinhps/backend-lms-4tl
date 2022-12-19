@@ -18,13 +18,15 @@ class MessageEvent implements ShouldBroadcast
     public $message;
     public $slug;
     public $name;
+    public $message_type;
 
-    public function __construct($slug, $user_id, $name, $message)
+    public function __construct($slug, $user_id, $name, $message, $message_type)
     {
         $this->slug = $slug;
         $this->user_id = $user_id;
         $this->message = $message;
         $this->name = $name;
+        $this->message_type = $message_type;
     }
 
     /**
@@ -38,6 +40,6 @@ class MessageEvent implements ShouldBroadcast
     }
     public function broadcastOn()
     {
-        return new PrivateChannel('room.' . $this->slug);
+        return new PresenceChannel('room.' . $this->slug);
     }
 }

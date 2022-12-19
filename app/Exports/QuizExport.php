@@ -15,6 +15,6 @@ class QuizExport implements FromView
     }
     public function view(): View
     {
-        return view('exports.quizByCourse',$this->res);
+        return view('exports.ListQuizLabByCourse',$this->res);
     }
 }

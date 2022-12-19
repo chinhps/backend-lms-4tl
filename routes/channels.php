@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Broadcast;
 */
 
 Broadcast::channel('room.{idRoom}', function ($user, $idRoom) {
-    return true;
+    return $user;
 });
 // Broadcast::channel('room.{id}', function ($user, $id) {
 //     // $data = CourseJoined::where('user_id', $user->id)->where('course_id', $id)->first();
