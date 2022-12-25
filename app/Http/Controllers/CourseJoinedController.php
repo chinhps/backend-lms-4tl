@@ -15,7 +15,7 @@ class CourseJoinedController extends Controller
     public function getListByCourse($slug)
     {
         $data = Course::with('course_joined.user.role')->where('slug', $slug)->first();
-        // return $data->course_joined;
+        // return $data;
         return CourseJoinedResource::collection($data->course_joined);
     }
 

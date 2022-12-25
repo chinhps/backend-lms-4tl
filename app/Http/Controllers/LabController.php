@@ -11,10 +11,38 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use ZipArchive;
 
 class LabController extends Controller
 {
+    public function download($file)
+    {
+        return Storage::disk('s3')->response('labs/' . $file);
+    }
+
+    public function download_all($slug_course)
+    {
+        // $zip = new ZipArchive;
+        // $course = Course::with(['point_submits' => function ($query) {
+        //     $query->where('pointsubmitable_type','labs');
+        // }])->where('slug',$slug_course)->firstOrFail();
+
+        // $fileName = 'Lab-' . $course->class_code . '.zip';
+
+        // foreach ($course->point_submits as $point_submits) {
+        //     $labs = json_decode($point_submits->content,true);
+        //     if(isset($labs[count($labs)-1])) {
+        //         var_dump($labs[count($labs)-1]);
+        //     }
+        // }
+        // return ($course);
+
+        // $fileName = '';
+        // return Storage::disk('s3')->response('labs/' . $file);
+    }
+    
     public function delete($slug)
     {
         $data = Lab::where('slug', $slug)->first()->delete();
@@ -125,7 +153,7 @@ class LabController extends Controller
                 'user_id' => Auth::id(),
                 'course_id' => $course->id ?? 0,
                 'content' => '[]',
-                'point' => 0,
+                'point' => null,
                 'status' => 1, # đã làm
             ]);
             $data_point = PointSubmit::with('pointsubmitable.deadlines')->find($new_point->id);
@@ -143,8 +171,8 @@ class LabController extends Controller
 
             $content = json_decode($data_point->content, true);
             foreach ($request->file('listFile') as $file) {
-                $name = time() . rand(1, 100) . '.' . $file->extension();
-                $file->move(public_path('files'), $name);
+                $name = Auth::id() . '-' . time() . rand(1, 100) . '.' . $file->extension();
+                $file->storeAs('labs/', $name, 's3');
                 $elmFile = [
                     "name" => $file->getClientOriginalName(),
                     "link" => $name

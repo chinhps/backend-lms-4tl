@@ -7,10 +7,17 @@ use App\Models\Course;
 use App\Models\Document;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class DocumentController extends Controller
 {
+
+    public function download($file)
+    {
+        return Storage::disk('s3')->response('documents/' . $file);
+    }
+
     public function delete($slug)
     {
         $data = Document::where('slug', $slug)->first()->delete();
@@ -40,8 +47,8 @@ class DocumentController extends Controller
             if ($request->hasfile('files')) {
                 foreach ($request->file('files') as $file) {
                     $name = time() . rand(1, 100) . Str::random(6) . '.' . $file->extension();
-                    $file->move(public_path('documents'), $name);
-                    $files = env('APP_URL') . "/documents/$name";
+                    $file->storeAs('documents/', $name, 's3');
+                    $files = $name;
                 }
             }
 

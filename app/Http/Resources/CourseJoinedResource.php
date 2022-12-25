@@ -16,11 +16,11 @@ class CourseJoinedResource extends JsonResource
     {
         return [
             "id" => $this->id,
-            "user_code" => $this->user->user_code,
-            "name" => $this->user->name,
-            "email" => $this->user->email,
-            "role_name" => $this->user->role->role_name,
-            "role_code" => $this->user->role->role_code,
+            "user_code" => $this->user->user_code ?? "Không xác định",
+            "name" => $this->user->name ?? "Không xác định",
+            "email" => $this->user->email ?? "Không xác định",
+            "role_name" => $this->user->role->role_name ?? "Không xác định",
+            "role_code" => $this->user->role->role_code ?? "Không xác định",
         ];
     }
 }
