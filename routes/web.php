@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BaseResponse;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
