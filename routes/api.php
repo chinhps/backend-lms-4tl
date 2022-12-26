@@ -51,6 +51,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/my-room', [ChatController::class, 'my_room']);
         Route::post('/send', [ChatController::class, 'send']);
         Route::get('/{slug}', [ChatController::class, 'list_message']);
+        Route::get('/view-image/{fileName}', [ChatController::class, 'view_image']);
     });
 
     # cây thư mục
@@ -97,6 +98,9 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/done', [LabController::class, 'submit_lab']);
             # tạo mới
             Route::post('/create', [LabController::class, 'upsert']);
+            # download
+            Route::post('/download/{file}', [LabController::class, 'download']);
+            Route::post('/download-all/{slug_course}', [LabController::class, 'download_all']);
         });
 
         Route::prefix('/document')->group(function () {
@@ -105,6 +109,8 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::delete('/{slug}', [DocumentController::class, 'delete']);
             # tạo mới
             Route::post('/create', [DocumentController::class, 'upsert']);
+            # download
+            Route::post('/download/{file}', [DocumentController::class, 'download']);
         });
 
         Route::prefix('/deadline')->group(function () {
@@ -228,9 +234,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
 Route::get('/create-slug', function () {
-    $data = DB::table('documents')->get();
+    $data = DB::table('courses')->get();
     foreach ($data as $vl) {
-        DB::table('documents')->where('id', $vl->id)->update([
+        DB::table('courses')->where('id', $vl->id)->update([
             'slug' => Str::slug($vl->name . '-' . Str::random(4))
         ]);
     }

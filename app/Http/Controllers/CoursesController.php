@@ -45,6 +45,11 @@ class CoursesController extends Controller
             ]
         )->find($course->subject_id);
 
+        $list_document = [...$course->documents, ...$subject->documents];
+        // usort($list_document, function ($a, $b) {
+        //     return $a['level'] <=> $b['level'];
+        // });
+
         $list_quiz = [...$course->quizs, ...$subject->quizs];
         usort($list_quiz, function ($a, $b) {
             return $a['level'] <=> $b['level'];
@@ -55,7 +60,7 @@ class CoursesController extends Controller
             return $a['level'] <=> $b['level'];
         });
 
-        return [$course, $subject, $list_quiz, $list_lab];
+        return [$course, $subject, $list_quiz, $list_lab, $list_document];
     }
 
 
@@ -64,14 +69,14 @@ class CoursesController extends Controller
 
         $role_code = Auth::user()->role->role_code;
         # lấy Quiz, Lab, sinh viên
-        list($data, $subject, $list_quiz, $list_lab) = $this->getQuizLabCourse($slug,$role_code);
+        list($data, $subject, $list_quiz, $list_lab, $list_document) = $this->getQuizLabCourse($slug, $role_code);
 
         # lấy những thông tin cơ bản của khóa học
         $courseResource = [
             "data" => [
                 'courses' => $data,
                 'student_joined' => $data->course_joined,
-                'documents' => $data->documents,
+                'documents' => $list_document,
                 'labs' => $list_lab,
                 'quizs' => $list_quiz,
             ]

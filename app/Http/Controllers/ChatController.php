@@ -11,9 +11,14 @@ use App\Models\CourseJoined;
 use App\Models\Message;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ChatController extends Controller
 {
+    public function view_image($fileName)
+    {
+        return Storage::disk('s3')->response('image-chat/' . $fileName);
+    }
     public function list_message($slug)
     {
         $messages = Course::with('messages.user', 'subject', 'course_joined')->where('slug', $slug)->first();
@@ -34,11 +39,11 @@ class ChatController extends Controller
         if ($request->hasfile('image')) {
             $file = $request->file('image');
             $name = time() . rand(1, 500) . '.' . $file->extension();
-            $file->move(public_path('image-chat'), $name);
+            $file->storeAs('image-chat/', $name, 's3');
 
             $dataSave['message'] = json_encode([
                 'message' => $message,
-                'link' => '/image-chat/' . $name
+                'link' => $name
             ]);
             $dataSave['message_type'] = 2;
         }

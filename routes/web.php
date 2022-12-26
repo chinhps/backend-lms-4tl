@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\BaseResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
@@ -18,6 +18,10 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return "Welcome to API LMS 4TL";
 });
+
+Route::get('/chinh', function (Request $request) {
+    dd($request);
+})->middleware('author')->can('chinh');
 // Clearing Laravel Configuration Cache
 Route::get('/clear-cache', function() {
     $exitCode = Artisan::call('config:clear');

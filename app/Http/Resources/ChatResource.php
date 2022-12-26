@@ -18,7 +18,9 @@ class ChatResource extends JsonResource
             "id" => $this->id,
             "name_course" => $this->subject->name . ' - ' .  $this->class_code,
             "members" => $this->course_joined()->count(),
-            "messages" => MessageResource::collection($this->messages),
+            "messages" => MessageResource::collection($this->messages()->orderBy('id','asc')
+            // ->take(20)
+            ->get()),
         ];
     }
 }

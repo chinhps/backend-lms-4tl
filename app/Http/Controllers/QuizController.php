@@ -52,16 +52,15 @@ class QuizController extends Controller
             ];
 
             if ($range == 'subjects') {
-                $course->subject->quizs()->updateOrCreate([
+                $data_course = $course->subject->quizs()->updateOrCreate([
                     'id' => $id
                 ], $dataUpsert);
             } else {
-                $course->quizs()->updateOrCreate([
+                $data_course = $course->quizs()->updateOrCreate([
                     'id' => $id
                 ], $dataUpsert);
             }
-
-            return BaseResponse::ResWithStatus($id ? "Sửa thành công!" : 'Tạo mới Quiz thành công! Cần cấu hình để có thể làm bài', 200);
+            return BaseResponse::ResWithStatus(!$data_course->wasRecentlyCreated && $data_course->wasChanged() ? "Sửa thành công!" : 'Tạo mới Quiz thành công! Cần cấu hình để có thể làm bài', 200);
         } catch (\Exception $err) {
             return BaseResponse::ResWithStatus($id ? "Có lỗi khi sửa!" : 'Có lỗi xảy ra khi tạo mới!', 500);
         }
@@ -176,7 +175,7 @@ class QuizController extends Controller
             'user_id' => Auth::id(),
             'status' => 0
         ])->get();
-        
+
         # không có bài đang làm và chưa đạt giới hạn thì tạo mới
         if (count($point_submit) == 0) {
 

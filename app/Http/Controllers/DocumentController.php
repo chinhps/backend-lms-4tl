@@ -7,10 +7,17 @@ use App\Models\Course;
 use App\Models\Document;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class DocumentController extends Controller
 {
+
+    public function download($file)
+    {
+        return Storage::disk('s3')->response('documents/' . $file);
+    }
+
     public function delete($slug)
     {
         $data = Document::where('slug', $slug)->first()->delete();
@@ -37,36 +44,37 @@ class DocumentController extends Controller
         ($rangeDocument == 'courses') ? $group_id = 2 : $group_id = 3;
 
         try {
-            if ($request->hasfile('files')) {
-                foreach ($request->file('files') as $file) {
-                    $name = time() . rand(1, 100) . Str::random(6) . '.' . $file->extension();
-                    $file->move(public_path('documents'), $name);
-                    $files = env('APP_URL') . "/documents/$name";
-                }
-            }
 
             $dataUpsert = [
                 'name' => $nameDocument,
                 'group_id' => $group_id,
-                'link' => $files,
                 'description' => ($description != 'null') ? $description : null,
                 'public' => 1,
                 'slug' => Str::slug($nameDocument . Str::random(8)),
             ];
 
+            if ($request->hasfile('files')) {
+                foreach ($request->file('files') as $file) {
+                    $name = time() . rand(1, 100) . Str::random(6) . '.' . $file->extension();
+                    $file->storeAs('documents/', $name, 's3');
+                    $dataUpsert['link'] = $name;
+                }
+            }
+
             $course = Course::with('documents', 'subject.documents')->where('slug', $slugCourse)->first();
             if ($rangeDocument == 'subjects') {
-                $course->subject->documents()->updateOrCreate([
+                $data_course = $course->subject->documents()->updateOrCreate([
                     'id' => $id ?? null
                 ], $dataUpsert);
             } else {
-                $course->documents()->updateOrCreate([
+                $data_course = $course->documents()->updateOrCreate([
                     'id' => $id ?? null
                 ], $dataUpsert);
             }
-            return BaseResponse::ResWithStatus($id ? "Sửa thành công!" : 'Tạo mới tài liệu thành công!', 200);
+            return BaseResponse::ResWithStatus(!$data_course->wasRecentlyCreated && $data_course->wasChanged() ? "Sửa thành công!" : 'Tạo mới tài liệu thành công!', 200);
         } catch (\Exception $err) {
-            return BaseResponse::ResWithStatus($id ? "Có lỗi khi sửa!" : 'Có lỗi xảy ra khi tạo mới!', 500);
+            return $err;
+            return BaseResponse::ResWithStatus('Có lỗi xảy ra!', 500);
         }
     }
 }
